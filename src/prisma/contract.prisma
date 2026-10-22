@@ -1,0 +1,13 @@
+// use prisma-8
+
+
+model Task {
+
+  id          String            @id @onCreate(uuid())
+  title       String
+  description String?
+  completed   Boolean             @default(false)
+  createdAt   TimestamptzString   @default(now())
+  updatedAt   temporal.updatedAtString()
+}
+
