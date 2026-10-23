@@ -1,7 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
-import { db } from "./src/prisma/db.ts";
+
 import { title } from "node:process";
+import { createTask, deleteTask, getAllTask, getTaskById, updateTask } from "./src/task/task.service.js";
 
 dotenv.config();
 
@@ -30,7 +31,7 @@ app.post("/tasks", async (req, res) => {
       completed: completed ?? false,
     };
 
-    const task = await db.orm.public.Task.create(data);
+    const task = await createTask(data)
 
     return res.status(201).json({
       status: true,
@@ -49,7 +50,7 @@ app.get("/tasks/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    const task = await db.orm.public.Task.where({ id }).first();
+    const task =  await getTaskById(id)
 
     if (!task) {
       return res.status(404).json({
@@ -71,6 +72,46 @@ app.get("/tasks/:id", async (req, res) => {
   }
 });
 
+
+
+
+app.get("/tasks", async (req, res) => {
+  try {
+   
+
+    const task =  await getAllTask()
+
+    if (!task) {
+      return res.status(404).json({
+        status: false,
+        message: "Task not found",
+      });
+    }
+
+    return res.status(200).json({
+      status: true,
+      message: "Task fetched successfully",
+      data: task,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: false,
+      message: "Internal server error",
+    });
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
 app.patch("/tasks/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -83,7 +124,7 @@ app.patch("/tasks/:id", async (req, res) => {
       });
     }
 
-    const task = await db.orm.public.Task.where({ id }).first();
+    const task = await getTaskById(id)
 
     if (!task) {
       return res.status(404).json({
@@ -94,7 +135,7 @@ app.patch("/tasks/:id", async (req, res) => {
 
     const data = { title, description, completed };
 
-    const updatedTask = await db.orm.public.Task.where({ id }).update(data);
+    const updatedTask = await updateTask(id,data)
 
     return res.status(200).json({
       status: true,
@@ -113,7 +154,7 @@ app.delete("/tasks/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    const task = await db.orm.public.Task.where({ id }).first();
+    const task = await getTaskById(id)
 
     if (!task) {
       return res.status(404).json({
@@ -122,7 +163,7 @@ app.delete("/tasks/:id", async (req, res) => {
       });
     }
 
-    const deleteTask = await db.orm.public.Task.where({ id }).delete();
+    const deletetask = await  deleteTask(id)
 
     return res.status(200).json({
       status: true,
