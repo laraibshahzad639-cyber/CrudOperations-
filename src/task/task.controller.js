@@ -1,6 +1,7 @@
 import { createTask, deleteTask, getAllTask, getTaskById } from "./task.service.js";
 import { sucessMessage } from "../utils/sucessMesage.js";
 import { errorMessage } from "../utils/errorMesage.js";
+import { db } from "../prisma/db.ts";
 
 export const createTaskController=async(req ,res ,next)=>{
     try {
@@ -23,20 +24,36 @@ export const createTaskController=async(req ,res ,next)=>{
         next(error)
       }
     }
-export const getAllTasksController= async(req,res,next)=>{
-    try {
-   
 
-    const task =  await getAllTask()
+export const getAllTasksController = async (req, res, next) => {
+  try {
+    const { completed } = req.query;
+    let task;
 
-    if (!task) {
-      return errorMessage(res,404,"Task Not Found ")}
+    if (completed === "true" || completed === "false") {
+      task = await db.orm.public.Task
+        .where({ completed: completed === "true" })
+        .all();
+    } else {
+      task = await db.orm.public.Task.all();
+    }
 
-    return sucessMessage(res,200,"Task Fetched sucessfully",task )
+    if (!task || task.length === 0) {
+      return errorMessage(res, 404, "Task Not Found");
+    }
+
+    return sucessMessage(
+      res,
+      200,
+      "Task Fetched successfully",
+      task
+    );
   } catch (error) {
-    next(error)
+      console.error("Get all tasks error:", error);
+    next(error);
   }
-}
+};
+
 
 export const deleteTaskController=async(req,res,next)=>{
   try {
