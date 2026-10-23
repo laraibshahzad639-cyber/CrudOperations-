@@ -12,9 +12,7 @@ app.use(express.json());
 const PORT = process.env.PORT || 4000;
 
 // app.use("/tasks", router)
-app.use("/api/tasks",routes)
-
-
+app.use("/api/tasks", routes);
 
 app.listen(PORT, () => {
   console.log(`Server is listening on Port ${PORT}`);

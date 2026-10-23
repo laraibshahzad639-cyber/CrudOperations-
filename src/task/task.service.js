@@ -1,16 +1,16 @@
 import { db } from "../prisma/db.ts";
-export const createTask =async(data)=>{
-    return db.orm.public.Task.create(data)
-}
-export const getTaskById=async(id)=>{
-    return db.orm.public.Task.where({id}).first()
-}
-export const deleteTask=async(id)=>{
-    return db.orm.public.Task.where({id}).delete()
-}
-export const updateTask=async(id,data)=>{
-    return db.orm.public.Task.where({id}).update(data)
-}
-export const getAllTask=async()=>{
-    return db.orm.public.Task.all()
-}
+export const createTask = async (data) => {
+  return db.orm.public.Task.create(data);
+};
+export const getTaskById = async (id) => {
+  return db.orm.public.Task.where({ id }).first();
+};
+export const deleteTask = async (id) => {
+  return db.orm.public.Task.where({ id }).delete();
+};
+export const updateTask = async (id, data) => {
+  return db.orm.public.Task.where({ id }).update(data);
+};
+export const getAllTask = async () => {
+  return db.orm.public.Task.all();
+};
