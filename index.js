@@ -15,8 +15,8 @@ const PORT = process.env.PORT || 4000;
 
 // app.use("/tasks", router)
 app.use("/api/tasks", routes);
-app.use(notFoundMiddleware)
-app.use(errorhandlerMiddleware)
+app.use(notFoundMiddleware);
+app.use(errorhandlerMiddleware);
 app.listen(PORT, () => {
   console.log(`Server is listening on Port ${PORT}`);
 });

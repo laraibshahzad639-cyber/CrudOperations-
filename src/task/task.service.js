@@ -11,6 +11,12 @@ export const deleteTask = async (id) => {
 export const updateTask = async (id, data) => {
   return db.orm.public.Task.where({ id }).update(data);
 };
-export const getAllTask = async () => {
-  return db.orm.public.Task.all();
+export const getAllTask = async (completedTask) => {
+  if (completedTask === undefined) {
+    return db.orm.public.Task.all();
+  }
+
+  return db.orm.public.Task
+    .where({ completed: completedTask })
+    .all();
 };
