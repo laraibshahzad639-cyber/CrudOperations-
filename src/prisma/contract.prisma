@@ -10,4 +10,12 @@ model Task {
   createdAt   TimestamptzString   @default(now())
   updatedAt   temporal.updatedAtString()
 }
+model User{
+  id String  @id @onCreate(uuid())
+  name String 
+  email  String @unique
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+
+}
 
