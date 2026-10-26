@@ -5,6 +5,7 @@ import { routes } from "./src/task/task.route.js";
 import { notFoundMiddleware } from "./src/middleware/notfound.middleeware.js";
 import { errorhandlerMiddleware } from "./src/middleware/errorhandler.middleware.js";
 import user from "./src/user/user.js";
+import { router } from "./src/user/user.route.js";
 
 dotenv.config();
 
@@ -15,7 +16,7 @@ app.use(express.json());
 const PORT = process.env.PORT || 4000;
 
 // app.use("/tasks", router)
-app.use("/users",user)
+app.use("/api/users",router)
 app.use("/api/tasks", routes);
 app.use(notFoundMiddleware);
 app.use(errorhandlerMiddleware);
