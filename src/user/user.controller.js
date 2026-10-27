@@ -39,7 +39,14 @@ export const createUserController = async (req, res) => {
 };
 export const getUserController = async (req, res) => {
   try {
-    const user = await getUsers();
+    const { limit } = req.query;
+    const { page } = req.query;
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+    const offset = (pageNumber - 1) * limitNumber;
+
+    const user = await getUsers(limitNumber, pageNumber);
+
     res.status(200).json({
       status: true,
       message: "User fetched sucessfully ",
@@ -52,6 +59,7 @@ export const getUserController = async (req, res) => {
     });
   }
 };
+ 
 export const deleteUserController = async (req, res) => {
   try {
     const { id } = req.params;
