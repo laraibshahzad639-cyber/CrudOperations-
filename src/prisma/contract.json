@@ -202,9 +202,7 @@
               "foreignKeys": [],
               "indexes": [],
               "primaryKey": {
-                "columns": [
-                  "id"
-                ]
+                "columns": ["id"]
               },
               "uniques": []
             },
@@ -243,15 +241,11 @@
               "foreignKeys": [],
               "indexes": [],
               "primaryKey": {
-                "columns": [
-                  "id"
-                ]
+                "columns": ["id"]
               },
               "uniques": [
                 {
-                  "columns": [
-                    "email"
-                  ]
+                  "columns": ["email"]
                 }
               ]
             }
