@@ -1,21 +1,18 @@
 // use prisma-8
-
-
 model Task {
-
-  id          String            @id @onCreate(uuid())
+  id          String                     @id @onCreate(uuid())
   title       String
   description String?
-  completed   Boolean             @default(false)
-  createdAt   TimestamptzString   @default(now())
+  completed   Boolean                    @default(false)
+  createdAt   TimestamptzString          @default(now())
   updatedAt   temporal.updatedAtString()
 }
-model User{
-  id String  @id @onCreate(uuid())
-  name String 
-  email  String @unique
-  createdAt TimestamptzString @default(now())
+
+model User {
+  id        String                     @id @onCreate(uuid())
+  name      String
+  email     String                     @unique
+  password String                      @unique
+  createdAt TimestamptzString          @default(now())
   updatedAt temporal.updatedAtString()
-
 }
-

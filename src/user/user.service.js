@@ -1,7 +1,7 @@
 import { db } from "../prisma/db.ts";
-export const createUser = async (data) => {
-  return await db.orm.public.User.create(data);
-};
+// export const createUser = async (data) => {
+//   return await db.orm.public.User.create(data);
+// };
 export const getUsers = async (limitNumber, pageNumber) => {
   const offset = (pageNumber - 1) * limitNumber;
 

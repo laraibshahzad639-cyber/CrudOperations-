@@ -6,17 +6,21 @@ import { notFoundMiddleware } from "./src/middleware/notfound.middleeware.js";
 import { errorhandlerMiddleware } from "./src/middleware/errorhandler.middleware.js";
 import user from "./src/user/user.js";
 import { router } from "./src/user/user.route.js";
+import { route } from "./src/auth/auth.route.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 const PORT = process.env.PORT || 4000;
 
 // app.use("/tasks", router)
 app.use("/api/users", router);
+app.use("/api/auth", route);
 app.use("/api/tasks", routes);
 app.use(notFoundMiddleware);
 app.use(errorhandlerMiddleware);

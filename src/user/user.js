@@ -1,6 +1,6 @@
 import express from "express";
 import {
-  createUserController,
+  //   createUserController,
   deleteUserController,
   getUserController,
   updateUserController,
@@ -10,7 +10,7 @@ import {
 
 const user = express.Router();
 
-user.post("/", createUserController);
+// user.post("/", createUserController);
 //   try {
 //     const { name, email } = req.body;
 

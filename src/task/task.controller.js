@@ -27,19 +27,23 @@ export const createTaskController = async (req, res, next) => {
 
 export const getAllTasksController = async (req, res, next) => {
   try {
- 
-   const {limit,page}=req.query
-   const pageNumber=Number(page)
-   const Limitnumber=Number(limit)
+    const { limit, page } = req.query;
+    const pageNumber = Number(page);
+    const Limitnumber = Number(limit);
+
     let task;
     const { completed } = req.query;
 
     if (completed === "true" || completed === "false") {
       const completedTask = completed === "true";
 
-      task = await TaskService.getAllTask(completedTask,pageNumber,Limitnumber);
+      task = await TaskService.getAllTask(
+        completedTask,
+        pageNumber,
+        Limitnumber
+      );
     } else if (completed === undefined) {
-      task = await TaskService.getAllTask(  undefined,pageNumber,Limitnumber);
+      task = await TaskService.getAllTask(undefined, pageNumber, Limitnumber);
     } else {
       return errorMessage(res, 400, "completed must be true or false");
     }

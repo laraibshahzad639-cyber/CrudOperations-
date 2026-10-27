@@ -1,42 +1,11 @@
 import {
-  createUser,
+  //   createUser,
   getUsers,
   updateUsers,
   getUserById,
   deleteUsers,
 } from "./user.service.js";
-export const createUserController = async (req, res) => {
-  try {
-    const { name, email } = req.body;
 
-    if (!name || !email) {
-      return res.status(400).json({
-        status: false,
-        message: "Email and Name are required",
-      });
-    }
-
-    const data = {
-      name,
-      email,
-    };
-
-    const createUsers = await createUser(data);
-
-    return res.status(201).json({
-      status: true,
-      message: "User created successfully",
-      data: createUsers,
-    });
-  } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({
-      status: false,
-      message: "Internal server error",
-    });
-  }
-};
 export const getUserController = async (req, res) => {
   try {
     const { limit } = req.query;
@@ -59,7 +28,7 @@ export const getUserController = async (req, res) => {
     });
   }
 };
- 
+
 export const deleteUserController = async (req, res) => {
   try {
     const { id } = req.params;
