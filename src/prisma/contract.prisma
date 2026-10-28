@@ -1,4 +1,8 @@
 // use prisma-8
+enum Role {
+  ADMIN
+  USER
+}
 model Task {
   id          String                     @id @onCreate(uuid())
   title       String
@@ -12,7 +16,8 @@ model User {
   id        String                     @id @onCreate(uuid())
   name      String
   email     String                     @unique
-  password String                      @unique
+  password  String
+   role      Role              @default(USER)
   createdAt TimestamptzString          @default(now())
   updatedAt temporal.updatedAtString()
 }

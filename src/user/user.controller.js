@@ -1,9 +1,10 @@
+import { errorMessage } from "../utils/errorMesage.js";
 import {
-  //   createUser,
   getUsers,
   updateUsers,
   getUserById,
   deleteUsers,
+  //   createUser,
 } from "./user.service.js";
 
 export const getUserController = async (req, res) => {
@@ -74,5 +75,19 @@ export const updateUserController = async (req, res) => {
       status: false,
       message: "Internal server error ",
     });
+  }
+};
+export const createUserController = async (req, res, next) => {
+  try {
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) {
+      return errorMessage(res, 400, "Name Email and Password are required ");
+    }
+    if (!["AMIN", "USER"].includes(role)) {
+      return errorMessage(res, 400, "Role must be Admin or User ");
+    }
+    const user = await createUser(name, email, password, role);
+  } catch (error) {
+    next(error);
   }
 };

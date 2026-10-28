@@ -23,7 +23,7 @@ import type {
 } from "@prisma/orm-postgres/contract/types";
 
 export type StorageHash =
-  StorageHashBase<"c7c0c7429a4a66266b19b5ccee1b9c4658e24969b5466396b5b2a71806bad0fb">;
+  StorageHashBase<"0b769cac54169646cbaadde3dbb071e8abfbff7ce2bc9595bff3e74299cb024d">;
 export type ExecutionHash =
   ExecutionHashBase<"9842ada760566dc68912dd8467d6a2eb7297293628fa1463014d6791d202c250">;
 export type ProfileHash =
@@ -526,7 +526,18 @@ type DefaultLiteralValue<
   : Encoded;
 type ParameterizedOutputTypeFunctions = PgParameterizedOutputTypes;
 
-type FieldTypeOverrides = {};
+type FieldTypeOverrides = {
+  readonly public: {
+    readonly models: {
+      readonly User: {
+        readonly role: {
+          readonly output: "ADMIN" | "USER";
+          readonly input: "ADMIN" | "USER";
+        };
+      };
+    };
+  };
+};
 export type FieldOutputTypes = FieldTypesFromDomain<
   ContractBase["domain"]["namespaces"],
   CodecTypes,
@@ -541,7 +552,16 @@ export type FieldInputTypes = FieldTypesFromDomain<
   FieldTypeOverrides,
   "input"
 >;
-type ColumnTypeOverrides = {};
+type ColumnTypeOverrides = {
+  readonly public: {
+    readonly User: {
+      readonly role: {
+        readonly output: "ADMIN" | "USER";
+        readonly input: "ADMIN" | "USER";
+      };
+    };
+  };
+};
 export type StorageColumnTypes = ColumnTypesFromStorage<
   ContractBase["storage"],
   CodecTypes,
@@ -573,6 +593,7 @@ export namespace Models {
     id: FieldOutputTypes["public"]["User"]["id"];
     name: FieldOutputTypes["public"]["User"]["name"];
     password: FieldOutputTypes["public"]["User"]["password"];
+    role: FieldOutputTypes["public"]["User"]["role"];
     updatedAt: FieldOutputTypes["public"]["User"]["updatedAt"];
     readonly [RelationKeys]?: never;
   };
@@ -691,6 +712,16 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly many: false;
                 };
+                readonly role: {
+                  readonly dataType: "pg/text";
+                  readonly codecId: "pg/text@1";
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: "literal";
+                    readonly value: DefaultLiteralValue<"pg/text@1", "USER">;
+                  };
+                  readonly many: false;
+                };
                 readonly updatedAt: {
                   readonly dataType: "pg/timestamptz";
                   readonly codecId: "pg/timestamptz-string@1";
@@ -699,12 +730,15 @@ type ContractBase = Omit<
                 };
               };
               primaryKey: { readonly columns: readonly ["id"] };
-              uniques: readonly [
-                { readonly columns: readonly ["email"] },
-                { readonly columns: readonly ["password"] },
-              ];
+              uniques: readonly [{ readonly columns: readonly ["email"] }];
               indexes: readonly [];
               foreignKeys: readonly [];
+            };
+          };
+          readonly valueSet: {
+            readonly Role: {
+              readonly kind: "valueSet";
+              readonly values: readonly ["ADMIN", "USER"];
             };
           };
         };
@@ -826,6 +860,13 @@ type ContractBase = Omit<
                   readonly codecId: "pg/text@1";
                 };
               };
+              readonly role: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: "scalar";
+                  readonly codecId: "pg/text@1";
+                };
+              };
               readonly updatedAt: {
                 readonly nullable: false;
                 readonly type: {
@@ -844,10 +885,26 @@ type ContractBase = Omit<
                 readonly id: { readonly column: "id" };
                 readonly name: { readonly column: "name" };
                 readonly password: { readonly column: "password" };
+                readonly role: { readonly column: "role" };
                 readonly updatedAt: { readonly column: "updatedAt" };
               };
             };
           };
+        };
+        readonly enum: {
+          readonly Role: {
+            readonly codecId: "pg/text@1";
+            readonly members: readonly [
+              { readonly name: "ADMIN"; readonly value: "ADMIN" },
+              { readonly name: "USER"; readonly value: "USER" },
+            ];
+          };
+        };
+        readonly enumMemberTypes?: {
+          readonly Role: readonly [
+            { readonly name: "ADMIN"; readonly value: "ADMIN" },
+            { readonly name: "USER"; readonly value: "USER" },
+          ];
         };
       };
     };

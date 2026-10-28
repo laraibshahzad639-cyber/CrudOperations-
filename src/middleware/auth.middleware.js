@@ -24,6 +24,7 @@ export const authenticationMiddleware = (req, res, next) => {
 
     req.user = {
       userId: decoded.userId,
+      role: decoded.role,
     };
 
     return next();
@@ -35,4 +36,17 @@ export const authenticationMiddleware = (req, res, next) => {
       message: "Invalid or expired token",
     });
   }
+};
+export const authorize = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({ message: "Logged in but not allowed" });
+    }
+
+    next();
+  };
 };

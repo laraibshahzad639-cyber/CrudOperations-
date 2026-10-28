@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import argon2 from "argon2";
 import { errorMessage } from "../utils/errorMesage.js";
 import { sucessMessage } from "../utils/sucessMesage.js";
-import { loginUser, registerUser } from "./auth.service.js";
+import { loginUser, myUser, registerUser } from "./auth.service.js";
 
 export const registerUserController = async (req, res, next) => {
   try {
@@ -13,7 +13,7 @@ export const registerUserController = async (req, res, next) => {
       return errorMessage(res, 400, "Name, Email and Password are required");
     }
 
-    const existingEmail = await loginUser(email)
+    const existingEmail = await loginUser(email);
 
     if (existingEmail) {
       return errorMessage(res, 409, "Email already exists");
@@ -27,7 +27,7 @@ export const registerUserController = async (req, res, next) => {
       password: hashedPassword,
     };
 
-    const user = await registerUser(data)
+    const user = await registerUser(data);
 
     const { password: _password, ...safeUser } = user;
 
@@ -45,7 +45,7 @@ export const loginController = async (req, res, next) => {
       return errorMessage(res, 400, "Email and Password are required");
     }
 
-    const user = await  loginUser(email)
+    const user = await loginUser(email);
 
     if (!user) {
       return errorMessage(res, 404, "User not found");
@@ -85,31 +85,21 @@ export const logoutController = async (req, res, next) => {
 
 export const myUserController = async (req, res, next) => {
   try {
-  
     const userId = req.user.userId;
 
     console.log("Authenticated user ID:", userId);
 
-    const currentUser = await db.orm.public.User
-      .where({ id: userId })
-      .first();
+    const currentUser = await myUser(userId);
 
     if (!currentUser) {
       return errorMessage(res, 404, "User not found");
     }
 
-    
     const { password: _password, ...safeUser } = currentUser;
 
-    return sucessMessage(
-      res,
-      200,
-      "User fetched successfully",
-      safeUser
-    );
+    return sucessMessage(res, 200, "User fetched successfully", safeUser);
   } catch (error) {
     console.error("My user controller error:", error);
     next(error);
   }
 };
-

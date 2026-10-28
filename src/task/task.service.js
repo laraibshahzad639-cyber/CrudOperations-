@@ -11,8 +11,16 @@ export const deleteTask = async (id) => {
 export const updateTask = async (id, data) => {
   return db.orm.public.Task.where({ id }).update(data);
 };
-export const getAllTask = async (completedTask, pageNumber, limitNumber) => {
+export const getAllTask = async (
+  completedTask,
+  pageNumber,
+  limitNumber,
+  userId
+) => {
   const offset = (pageNumber - 1) * limitNumber;
+  if (userId) {
+    return db.orm.public.Task.where({ userId }).all();
+  }
   if (completedTask === undefined) {
     return db.orm.public.Task.limit(limitNumber).offset(offset).all();
   }

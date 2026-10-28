@@ -48,13 +48,28 @@ export const getAllTasksController = async (req, res, next) => {
       return errorMessage(res, 400, "completed must be true or false");
     }
 
+    const currentUser = await db.orm.public.User.where({
+      id: req.user.userId,
+    }).first();
+
+    if (!currentUser) {
+      return errorMessage(res, 404, "User not found");
+    }
+
+    const userId = currentUser.role === "ADMIN" ? undefined : currentUser.id;
+
+    task = await TaskService.getAllTask(
+      completed === "true" ? true : completed === "false" ? false : undefined,
+      pageNumber,
+      Limitnumber,
+      userId
+    );
     return sucessMessage(res, 200, "Tasks fetched successfully", task);
   } catch (error) {
     console.error("Get all tasks error:", error);
     next(error);
   }
 };
-
 export const deleteTaskController = async (req, res, next) => {
   try {
     const { id } = req.params;
