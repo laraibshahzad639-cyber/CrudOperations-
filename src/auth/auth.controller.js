@@ -60,9 +60,13 @@ export const loginController = async (req, res, next) => {
       throw new Error("JWT_SECRET is not configured");
     }
 
-    const accessToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "2d",
-    });
+    const accessToken = jwt.sign(
+      { userId: user.id, role: user.role },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "2d",
+      }
+    );
 
     res.cookie("access_token", accessToken, {});
 

@@ -2,6 +2,7 @@ import * as TaskService from "./task.service.js";
 import { sucessMessage } from "../utils/sucessMesage.js";
 import { errorMessage } from "../utils/errorMesage.js";
 import { db } from "../prisma/db.ts";
+import { type } from "node:os";
 
 export const createTaskController = async (req, res, next) => {
   try {
@@ -24,52 +25,86 @@ export const createTaskController = async (req, res, next) => {
     next(error);
   }
 };
+// export const getTask = async (req, res, next) => {
+//   try {
+//     console.log("hello from task controller")
+//     // const { limit, page } = req.query;
 
-export const getAllTasksController = async (req, res, next) => {
-  try {
-    const { limit, page } = req.query;
-    const pageNumber = Number(page);
-    const Limitnumber = Number(limit);
+//     // const pageNum = Number(page);
+//     // const limitNum = Number(limit);
+//     // console.log("limit", typeof limitNum);
+//     // console.log("pagnum", typeof pageNum);
+//     // const { completed } = req.query;
+//     // const offset = (pageNum - 1) * limitNum;
 
-    let task;
-    const { completed } = req.query;
+//     // const query = {};
 
-    if (completed === "true" || completed === "false") {
-      const completedTask = completed === "true";
+//     // if (completed === "true" || completed === "false") {
+//     //   query.completed = completed === "true";
+//     // }
 
-      task = await TaskService.getAllTask(
-        completedTask,
-        pageNumber,
-        Limitnumber
-      );
-    } else if (completed === undefined) {
-      task = await TaskService.getAllTask(undefined, pageNumber, Limitnumber);
-    } else {
-      return errorMessage(res, 400, "completed must be true or false");
-    }
+//     // const tasks = await db.orm.public.Task.limit(limitNum)
+//     //   .offset(offset)
+//     //   .where(query)
+//     //   .all();
 
-    const currentUser = await db.orm.public.User.where({
-      id: req.user.userId,
-    }).first();
+//     const ac = await TaskService.getAllTask()
 
-    if (!currentUser) {
-      return errorMessage(res, 404, "User not found");
-    }
+//     return sucessMessage(res, 200, "Tasks fetched successfully", ac);
+//   } catch (error) {
+//     console.error("Get tasks error:", error);
+//     next(error);
+//   }
+// };
 
-    const userId = currentUser.role === "ADMIN" ? undefined : currentUser.id;
+// export const getAllTasksController = async (req, res, next) => {
+//   try {
+//     const { limit, page, completed } = req.query;
+//     const pageNumber = Number(page) || 1;
+//     const limitNumber = Number(limit) || 10;
 
-    task = await TaskService.getAllTask(
-      completed === "true" ? true : completed === "false" ? false : undefined,
-      pageNumber,
-      Limitnumber,
-      userId
-    );
-    return sucessMessage(res, 200, "Tasks fetched successfully", task);
-  } catch (error) {
-    console.error("Get all tasks error:", error);
-    next(error);
-  }
-};
+//     if (completed !== undefined && completed !== "true" && completed !== "false") {
+//       return errorMessage(res, 400, "completed must be true or false");
+//     }
+
+//     // if (!req.user || !req.user.userId) {
+//     //   return errorMessage(res, 401, "Unauthorized access token missing or invalid");
+//     // }
+
+//     const currentUser = await db.orm.public.User
+//       .where({ id: req.user.userId })
+//       .first();
+
+//     if (!currentUser) {
+//       return errorMessage(res, 404, "User not found");
+//     }
+
+//     const userId = currentUser.role === "ADMIN" ? undefined : currentUser.id;
+
+//     let completedTask;
+//     if (completed === "true") completedTask = true;
+//     if (completed === "false") completedTask = false;
+
+//     const task = await TaskService.getAllTask(
+//       completedTask,
+//       pageNumber,
+//       limitNumber,
+//       userId
+//     );
+
+//     return sucessMessage(res, 200, "Tasks fetched successfully", task);
+
+//   }  catch (error) {
+//   console.error("Get all tasks error:", error);
+
+//   if (res.headersSent) {
+//     return next(error);
+//   }
+
+//   return next(error);
+// }
+// }
+
 export const deleteTaskController = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -124,5 +159,45 @@ export const updateTaskController = async (req, res, next) => {
     return sucessMessage(res, 200, "Task updated sucuessfully", updatedTask);
   } catch (error) {
     next(error);
+  }
+};
+
+// const tasks = await db.orm.public.Task.all();
+// return sucessMessage(res, 200, "Task updated sucuessfully", tasks);
+
+// export const check = async (req, res) => {
+//   const t = await db.orm.public.Task.limit(10).all();
+//   console.log("cgeck", t);
+//   return sucessMessage(res, 200, "ASDASDasd", t);
+// };
+
+export const getAllTaskController = async (req, res, next) => {
+  try {
+    const { completed, page, limit } = req.query;
+    console.log(`page is ${typeof page},limit is ${typeof limit}`);
+
+    const page1 = Number(page);
+    const limit1 = Number(limit);
+
+    console.log(`value of page is ${page1},value oflimit is ${limit1}`);
+
+    // const offset = (pageNumber - 1) * limitNumber;
+
+    // if (completed === "true" || completed === "false") {
+    const task = await TaskService.getAllTask(page1, limit1);
+
+    return sucessMessage(res, 200, "Tasks fetched successfully", task);
+    // }
+
+    // const task = await TaskService.getAllTask();
+
+    // if (task.length === 0) {
+    //   return errorMessage(res, 404, "Task Not found");
+    // }
+
+    // return sucessMessage(res, 200, "Task fetched successfully", task);
+  } catch (error) {
+    console.error("Get all tasks error:", error);
+    return next(error);
   }
 };

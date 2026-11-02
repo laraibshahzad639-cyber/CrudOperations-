@@ -8,7 +8,7 @@ import user from "./src/user/user.js";
 import { router } from "./src/user/user.route.js";
 import { route } from "./src/auth/auth.route.js";
 import cookieParser from "cookie-parser";
-
+// import { authorize } from "./src/middleware/role.middleware.js";
 dotenv.config();
 
 const app = express();
@@ -22,6 +22,7 @@ const PORT = process.env.PORT || 4000;
 app.use("/api/users", router);
 app.use("/api/auth", route);
 app.use("/api/tasks", routes);
+
 app.use(notFoundMiddleware);
 app.use(errorhandlerMiddleware);
 app.listen(PORT, () => {

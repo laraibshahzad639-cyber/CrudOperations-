@@ -27,26 +27,17 @@ export const authenticationMiddleware = (req, res, next) => {
       role: decoded.role,
     };
 
+  console.log("3. Authentication successful");
+    console.log("User:", req.user);
+
     return next();
   } catch (error) {
-    console.error("JWT verification error:", error.message);
+     console.log("4. Authentication failed:", error.message);
+    // console.error("JWT verification error:", error.message);
 
     return res.status(401).json({
       status: false,
       message: "Invalid or expired token",
     });
   }
-};
-export const authorize = (...allowedRoles) => {
-  return (req, res, next) => {
-    if (!req.user || !req.user.role) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    if (!allowedRoles.includes(req.user.role)) {
-      return res.status(403).json({ message: "Logged in but not allowed" });
-    }
-
-    next();
-  };
 };

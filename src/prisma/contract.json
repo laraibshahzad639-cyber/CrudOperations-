@@ -243,7 +243,9 @@
               "foreignKeys": [],
               "indexes": [],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": []
             },
@@ -309,11 +311,15 @@
               "foreignKeys": [],
               "indexes": [],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["email"]
+                  "columns": [
+                    "email"
+                  ]
                 }
               ]
             }
@@ -321,7 +327,10 @@
           "valueSet": {
             "Role": {
               "kind": "valueSet",
-              "values": ["ADMIN", "USER"]
+              "values": [
+                "ADMIN",
+                "USER"
+              ]
             }
           }
         },
