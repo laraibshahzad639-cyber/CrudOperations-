@@ -29,8 +29,13 @@ export const createTask = async (data) => {
 // };
 export const getAllTask = async (page1 = 1, limit1 = 10) => {
   // if (completed === undefined) {
+  if(page1&limit1){
+
+  
   const skip = (page1 - 1) * limit1;
   return await db.orm.public.Task.limit(limit1).offset(skip).all();
-  // }
-  // return await db.orm.public.Task.all();
+  }
+
+
+  return await db.orm.public.Task.all();
 };
