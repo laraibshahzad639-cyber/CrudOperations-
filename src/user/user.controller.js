@@ -7,7 +7,6 @@ import {
   deleteUsers,
   updatedUserRole,
   createUser,
-
 } from "./user.service.js";
 
 export const getUserController = async (req, res) => {
@@ -20,7 +19,7 @@ export const getUserController = async (req, res) => {
 
     const user = await getUsers(limitNumber, pageNumber);
 
-    const safeUsers = user.map(({ password, ...user }) => user);      
+    const safeUsers = user.map(({ password, ...user }) => user);
 
     res.status(200).json({
       status: true,
@@ -36,18 +35,18 @@ export const getUserController = async (req, res) => {
 };
 export const getUserByIdController = async (req, res, next) => {
   try {
-    const {id}=req.params
-    const user=await getUserById(id)
+    const { id } = req.params;
+    const user = await getUserById(id);
 
     if (!user) {
-      return errorMessage(res,404,"User not found ")
+      return errorMessage(res, 404, "User not found ");
     }
 
     const { password, ...safeUser } = user;
 
     return sucessMessage(res, 200, "User fetched successfully", safeUser);
   } catch (error) {
-    console.error("check error",error)
+    console.error("check error", error);
     next(error);
   }
 };

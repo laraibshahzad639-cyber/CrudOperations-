@@ -7,11 +7,11 @@ import { error } from "node:console";
 
 export const createTaskController = async (req, res, next) => {
   try {
-      console.log("Logged-in user:", req.user);
+    console.log("Logged-in user:", req.user);
     const { title, description, completed } = req.body;
 
     if (!title || !description) {
-      console.error("check error",error)
+      console.error("check error", error);
       return errorMessage(res, 400, "Tittle and description are required ");
     }
 
@@ -19,18 +19,17 @@ export const createTaskController = async (req, res, next) => {
       title,
       description,
       completed: completed ?? false,
-       userId:req.user.userId
+      userId: req.user.userId,
     };
 
     const task = await TaskService.createTask(data);
 
     return sucessMessage(res, 201, "Task created sucessfully", task);
   } catch (error) {
-     console.error("check error",error)
+    console.error("check error", error);
     next(error);
   }
 };
-
 
 export const deleteTaskController = async (req, res, next) => {
   try {
@@ -43,9 +42,9 @@ export const deleteTaskController = async (req, res, next) => {
     }
 
     const deletetask = await TaskService.deleteTask(id);
-  return sucessMessage(res, 200, "Task Deleted Sucessfully");
+    return sucessMessage(res, 200, "Task Deleted Sucessfully");
   } catch (error) {
-    console.error("check ",error)
+    console.error("check ", error);
     next(error);
   }
 };
@@ -53,8 +52,7 @@ export const getTaskByIdController = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const task = await TaskService.getTaskById(id,req.user.userId);
-
+    const task = await TaskService.getTaskById(id, req.user.userId);
 
     if (!task) {
       return errorMessage(res, 404, "Task Not Found ");
@@ -62,7 +60,7 @@ export const getTaskByIdController = async (req, res, next) => {
 
     return sucessMessage(res, 200, "Task Fetched Sucessfully ", task);
   } catch (error) {
-    console.error("check error",error)  
+    console.error("check error", error);
     next(error);
   }
 };
@@ -75,7 +73,7 @@ export const updateTaskController = async (req, res, next) => {
       return errorMessage(res, 400, "Tittle and description are required");
     }
 
-    const task = await TaskService.getTaskById(id,req.user.userId);
+    const task = await TaskService.getTaskById(id, req.user.userId);
 
     if (!task) {
       return errorMessage(res, 404, "Task Not Found");
@@ -83,15 +81,14 @@ export const updateTaskController = async (req, res, next) => {
 
     const data = { title, description, completed };
 
-    const updatedTask = await TaskService.updateTask(id,  req.user.userId,data);
+    const updatedTask = await TaskService.updateTask(id, req.user.userId, data);
 
     return sucessMessage(res, 200, "Task updated sucuessfully", updatedTask);
   } catch (error) {
-    console.error("check error",error)
+    console.error("check error", error);
     next(error);
   }
 };
-
 
 export const getAllTaskController = async (req, res, next) => {
   try {
@@ -109,7 +106,13 @@ export const getAllTaskController = async (req, res, next) => {
 
     let task;
 
-    if (completed === "true" || completed === "false" || page || limit || order) {
+    if (
+      completed === "true" ||
+      completed === "false" ||
+      page ||
+      limit ||
+      order
+    ) {
       task = await TaskService.getAllTask(
         req.user.role,
         req.user.userId,
@@ -119,14 +122,10 @@ export const getAllTaskController = async (req, res, next) => {
         order
       );
     } else {
-      task = await TaskService.getAllTask(
-        req.user.role,
-        req.user.userId
-      );
+      task = await TaskService.getAllTask(req.user.role, req.user.userId);
     }
 
     return sucessMessage(res, 200, "Tasks fetched successfully", task);
-
   } catch (error) {
     console.error("Get all tasks error:", error);
     return next(error);

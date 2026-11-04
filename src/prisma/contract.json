@@ -89,12 +89,8 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": [
-                    "userId"
-                  ],
-                  "targetFields": [
-                    "id"
-                  ]
+                  "localFields": ["userId"],
+                  "targetFields": ["id"]
                 },
                 "to": {
                   "model": "User",
@@ -192,12 +188,8 @@
               "tasks": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": [
-                    "id"
-                  ],
-                  "targetFields": [
-                    "userId"
-                  ]
+                  "localFields": ["id"],
+                  "targetFields": ["userId"]
                 },
                 "to": {
                   "model": "Task",
@@ -294,16 +286,12 @@
                     "name": "Task_userId_idx_a489d58a"
                   },
                   "source": {
-                    "columns": [
-                      "userId"
-                    ],
+                    "columns": ["userId"],
                     "namespaceId": "public",
                     "tableName": "Task"
                   },
                   "target": {
-                    "columns": [
-                      "id"
-                    ],
+                    "columns": ["id"],
                     "namespaceId": "public",
                     "tableName": "User"
                   }
@@ -311,28 +299,20 @@
               ],
               "indexes": [
                 {
-                  "columns": [
-                    "userId",
-                    "createdAt",
-                    "completed"
-                  ],
+                  "columns": ["userId", "createdAt", "completed"],
                   "name": "Task_userId_createdAt_completed_idx_3eefd6d2",
                   "prefix": "Task_userId_createdAt_completed_idx",
                   "unique": false
                 },
                 {
-                  "columns": [
-                    "userId"
-                  ],
+                  "columns": ["userId"],
                   "name": "Task_userId_idx_a489d58a",
                   "prefix": "Task_userId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": [
-                  "id"
-                ]
+                "columns": ["id"]
               },
               "uniques": []
             },
@@ -398,24 +378,18 @@
               "foreignKeys": [],
               "indexes": [
                 {
-                  "columns": [
-                    "createdAt"
-                  ],
+                  "columns": ["createdAt"],
                   "name": "User_createdAt_idx_9575dbd7",
                   "prefix": "User_createdAt_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": [
-                  "id"
-                ]
+                "columns": ["id"]
               },
               "uniques": [
                 {
-                  "columns": [
-                    "email"
-                  ]
+                  "columns": ["email"]
                 }
               ]
             }
@@ -423,10 +397,7 @@
           "valueSet": {
             "Role": {
               "kind": "valueSet",
-              "values": [
-                "ADMIN",
-                "USER"
-              ]
+              "values": ["ADMIN", "USER"]
             }
           }
         },
