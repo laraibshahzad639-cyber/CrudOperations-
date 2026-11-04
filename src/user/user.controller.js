@@ -20,10 +20,12 @@ export const getUserController = async (req, res) => {
 
     const user = await getUsers(limitNumber, pageNumber);
 
+    const safeUsers = user.map(({ password, ...user }) => user);      
+
     res.status(200).json({
       status: true,
       message: "User fetched sucessfully ",
-      data: user,
+      data: safeUsers,
     });
   } catch (error) {
     res.status(404).json({
@@ -43,7 +45,7 @@ export const getUserByIdController = async (req, res, next) => {
 
     const { password, ...safeUser } = user;
 
-    return sendSuccess(res, 200, "User fetched successfully", safeUser);
+    return sucessMessage(res, 200, "User fetched successfully", safeUser);
   } catch (error) {
     console.error("check error",error)
     next(error);

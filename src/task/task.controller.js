@@ -30,100 +30,22 @@ export const createTaskController = async (req, res, next) => {
     next(error);
   }
 };
-// export const getTask = async (req, res, next) => {
-//   try {
-//     console.log("hello from task controller")
-//     // const { limit, page } = req.query;
 
-//     // const pageNum = Number(page);
-//     // const limitNum = Number(limit);
-//     // console.log("limit", typeof limitNum);
-//     // console.log("pagnum", typeof pageNum);
-//     // const { completed } = req.query;
-//     // const offset = (pageNum - 1) * limitNum;
-
-//     // const query = {};
-
-//     // if (completed === "true" || completed === "false") {
-//     //   query.completed = completed === "true";
-//     // }
-
-//     // const tasks = await db.orm.public.Task.limit(limitNum)
-//     //   .offset(offset)
-//     //   .where(query)
-//     //   .all();
-
-//     const ac = await TaskService.getAllTask()
-
-//     return sucessMessage(res, 200, "Tasks fetched successfully", ac);
-//   } catch (error) {
-//     console.error("Get tasks error:", error);
-//     next(error);
-//   }
-// };
-
-// export const getAllTasksController = async (req, res, next) => {
-//   try {
-//     const { limit, page, completed } = req.query;
-//     const pageNumber = Number(page) || 1;
-//     const limitNumber = Number(limit) || 10;
-
-//     if (completed !== undefined && completed !== "true" && completed !== "false") {
-//       return errorMessage(res, 400, "completed must be true or false");
-//     }
-
-//     // if (!req.user || !req.user.userId) {
-//     //   return errorMessage(res, 401, "Unauthorized access token missing or invalid");
-//     // }
-
-//     const currentUser = await db.orm.public.User
-//       .where({ id: req.user.userId })
-//       .first();
-
-//     if (!currentUser) {
-//       return errorMessage(res, 404, "User not found");
-//     }
-
-//     const userId = currentUser.role === "ADMIN" ? undefined : currentUser.id;
-
-//     let completedTask;
-//     if (completed === "true") completedTask = true;
-//     if (completed === "false") completedTask = false;
-
-//     const task = await TaskService.getAllTask(
-//       completedTask,
-//       pageNumber,
-//       limitNumber,
-//       userId
-//     );
-
-//     return sucessMessage(res, 200, "Tasks fetched successfully", task);
-
-//   }  catch (error) {
-//   console.error("Get all tasks error:", error);
-
-//   if (res.headersSent) {
-//     return next(error);
-//   }
-
-//   return next(error);
-// }
-// }
 
 export const deleteTaskController = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const task = await getTaskById(id);
+    const task = await TaskService.getTaskById(id);
 
     if (!task) {
       return errorMessage(res, 404, " Task Not Found ");
     }
 
-    const deletetask = await deleteTask(id);
-
-    return sucessMessage(res, 200, "Task Deleted Sucessfully");
+    const deletetask = await TaskService.deleteTask(id);
+  return sucessMessage(res, 200, "Task Deleted Sucessfully");
   } catch (error) {
+    console.error("check ",error)
     next(error);
   }
 };

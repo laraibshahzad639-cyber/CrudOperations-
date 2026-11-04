@@ -13,9 +13,10 @@ import { authenticationMiddleware } from "../middleware/auth.middleware.js";
 const router = express.Router();
 router.post("/", createUserController);
 router.get("/", getUserController);
-router.get("/:id",getUserByIdController)
+router.get("/:id", authenticationMiddleware, isAdmin, getUserByIdController);
+
 router.delete("/", deleteUserController);
-router.patch("/:id", updateUserController);
+router.patch("/:id", authenticationMiddleware, isAdmin, updateUserController);
 router.patch(
   "/:id/role",
   authenticationMiddleware,
