@@ -1,10 +1,13 @@
 import { errorMessage } from "../utils/errorMesage.js";
+import { sucessMessage } from "../utils/sucessMesage.js";
 import {
   getUsers,
   updateUsers,
   getUserById,
   deleteUsers,
-  //   createUser,
+  updatedUserRole,
+  createUser,
+
 } from "./user.service.js";
 
 export const getUserController = async (req, res) => {
@@ -27,6 +30,23 @@ export const getUserController = async (req, res) => {
       status: false,
       message: "User not found",
     });
+  }
+};
+export const getUserByIdController = async (req, res, next) => {
+  try {
+    const {id}=req.params
+    const user=await getUserById(id)
+
+    if (!user) {
+      return errorMessage(res,404,"User not found ")
+    }
+
+    const { password, ...safeUser } = user;
+
+    return sendSuccess(res, 200, "User fetched successfully", safeUser);
+  } catch (error) {
+    console.error("check error",error)
+    next(error);
   }
 };
 
@@ -83,11 +103,38 @@ export const createUserController = async (req, res, next) => {
     if (!name || !email || !password) {
       return errorMessage(res, 400, "Name Email and Password are required ");
     }
-    if (!["AMIN", "USER"].includes(role)) {
+    if (!["ADMIN", "USER"].includes(role)) {
       return errorMessage(res, 400, "Role must be Admin or User ");
     }
     const user = await createUser(name, email, password, role);
   } catch (error) {
+    next(error);
+  }
+};
+export const updateUserRoleController = async (req, res, next) => {
+  try {
+    const { role } = req.body;
+    const { id } = req.params;
+    if (!["ADMIN", "USER"].includes(role)) {
+      return errorMessage(res, 400, "Role must be Admin or User ");
+    }
+
+    const user = await getUserById(id);
+    if (!user) {
+      return errorMessage(res, 404, "User not found");
+    }
+
+    await updatedUserRole(id, role);
+    const updatedUser = await getUserById(id);
+
+    return sucessMessage(
+      res,
+      200,
+      "User role updated successfully",
+      updatedUser
+    );
+  } catch (error) {
+    console.error("Update user role error:", error);
     next(error);
   }
 };

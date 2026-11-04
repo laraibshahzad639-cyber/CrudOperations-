@@ -1,6 +1,9 @@
+
 import jwt from "jsonwebtoken";
 
 export const authenticationMiddleware = (req, res, next) => {
+  console.log("1. Authentication middleware called");
+
   const accessToken = req.cookies?.access_token;
 
   if (!accessToken) {
@@ -21,19 +24,18 @@ export const authenticationMiddleware = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+    console.log("Decoded token:", decoded);
 
     req.user = {
       userId: decoded.userId,
       role: decoded.role,
     };
 
-  console.log("3. Authentication successful");
-    console.log("User:", req.user);
+    console.log("User Role:", req.user.role);
 
     return next();
   } catch (error) {
-     console.log("4. Authentication failed:", error.message);
-    // console.error("JWT verification error:", error.message);
+    console.log("4. Authentication failed:", error.message);
 
     return res.status(401).json({
       status: false,

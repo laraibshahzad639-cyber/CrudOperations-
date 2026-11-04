@@ -23,7 +23,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'0b769cac54169646cbaadde3dbb071e8abfbff7ce2bc9595bff3e74299cb024d'>;
+  StorageHashBase<'e89e9ac43c1469361721ff2e7a8b8bfd72580104abe33db9afb6b2a4ea813c3b'>;
 export type ExecutionHash =
   ExecutionHashBase<'9842ada760566dc68912dd8467d6a2eb7297293628fa1463014d6791d202c250'>;
 export type ProfileHash =
@@ -291,7 +291,9 @@ export namespace Models {
     id: FieldOutputTypes['public']['Task']['id'];
     title: FieldOutputTypes['public']['Task']['title'];
     updatedAt: FieldOutputTypes['public']['Task']['updatedAt'];
-    readonly [RelationKeys]?: never;
+    userId: FieldOutputTypes['public']['Task']['userId'];
+    user: public_User;
+    readonly [RelationKeys]?: 'user';
   };
   export type public_User = {
     createdAt: FieldOutputTypes['public']['User']['createdAt'];
@@ -301,7 +303,8 @@ export namespace Models {
     password: FieldOutputTypes['public']['User']['password'];
     role: FieldOutputTypes['public']['User']['role'];
     updatedAt: FieldOutputTypes['public']['User']['updatedAt'];
-    readonly [RelationKeys]?: never;
+    tasks: public_Task[];
+    readonly [RelationKeys]?: 'tasks';
   };
 }
 
@@ -373,11 +376,43 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly many: false;
                 };
+                readonly userId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
               };
               primaryKey: { readonly columns: readonly ['id'] };
               uniques: readonly [];
-              indexes: readonly [];
-              foreignKeys: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'Task_userId_createdAt_completed_idx_3eefd6d2';
+                  readonly prefix: 'Task_userId_createdAt_completed_idx';
+                  readonly columns: readonly ['userId', 'createdAt', 'completed'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'Task_userId_idx_a489d58a';
+                  readonly prefix: 'Task_userId_idx';
+                  readonly columns: readonly ['userId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Task';
+                    readonly columns: readonly ['userId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'User';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
             };
             readonly User: {
               columns: {
@@ -431,7 +466,14 @@ type ContractBase = Omit<
               };
               primaryKey: { readonly columns: readonly ['id'] };
               uniques: readonly [{ readonly columns: readonly ['email'] }];
-              indexes: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'User_createdAt_idx_9575dbd7';
+                  readonly prefix: 'User_createdAt_idx';
+                  readonly columns: readonly ['createdAt'];
+                  readonly unique: false;
+                },
+              ];
               foreignKeys: readonly [];
             };
           };
@@ -490,8 +532,22 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/timestamptz-string@1';
                 };
               };
+              readonly userId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
             };
-            readonly relations: Record<string, never>;
+            readonly relations: {
+              readonly user: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['userId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
             readonly storage: {
               readonly table: 'Task';
               readonly namespaceId: 'public';
@@ -502,6 +558,7 @@ type ContractBase = Omit<
                 readonly id: { readonly column: 'id' };
                 readonly title: { readonly column: 'title' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
+                readonly userId: { readonly column: 'userId' };
               };
             };
           };
@@ -542,7 +599,16 @@ type ContractBase = Omit<
                 };
               };
             };
-            readonly relations: Record<string, never>;
+            readonly relations: {
+              readonly tasks: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Task' };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['userId'];
+                };
+              };
+            };
             readonly storage: {
               readonly table: 'User';
               readonly namespaceId: 'public';

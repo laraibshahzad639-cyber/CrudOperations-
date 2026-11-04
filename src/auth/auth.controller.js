@@ -42,12 +42,15 @@ export const loginController = async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
+      console.log("Database user role:", user.role);
       return errorMessage(res, 400, "Email and Password are required");
     }
 
     const user = await loginUser(email);
+    console.log("Database user role:", user.role);
 
     if (!user) {
+      console.log("Database user role:", user.role);
       return errorMessage(res, 404, "User not found");
     }
 

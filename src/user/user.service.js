@@ -15,6 +15,11 @@ export const deleteUsers = async (id) => {
   return await db.orm.public.User.where({ id }).delete();
 };
 
-export const createUser = async (data) => {
-  return await db.orm.public.User.create(data);
+export const createUser=async(data)=>{
+    return await db.orm.public.User.create(data)
+}
+export const updatedUserRole = async (id, role) => {
+  return await db.orm.public.User.where({ id }).update({
+    role: role
+  });
 };

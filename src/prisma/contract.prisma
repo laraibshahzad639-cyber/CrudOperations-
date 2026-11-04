@@ -3,21 +3,29 @@ enum Role {
   ADMIN
   USER
 }
-model Task {
-  id          String                     @id @onCreate(uuid())
-  title       String
-  description String?
-  completed   Boolean                    @default(false)
-  createdAt   TimestamptzString          @default(now())
-  updatedAt   temporal.updatedAtString()
-}
 
 model User {
   id        String                     @id @onCreate(uuid())
   name      String
   email     String                     @unique
   password  String
-   role      Role              @default(USER)
+  role      Role                       @default(USER)
+  tasks     Task[]
   createdAt TimestamptzString          @default(now())
   updatedAt temporal.updatedAtString()
+
+  @@index([createdAt])
+}
+
+model Task {
+  id          String                     @id @onCreate(uuid())
+  title       String
+  userId      String
+  user        User                       @relation(fields: [userId], references: [id])
+  description String?
+  completed   Boolean                    @default(false)
+  createdAt   TimestamptzString          @default(now())
+  updatedAt   temporal.updatedAtString()
+
+  @@index([userId, createdAt])
 }

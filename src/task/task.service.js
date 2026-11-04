@@ -2,40 +2,37 @@ import { db } from "../prisma/db.ts";
 export const createTask = async (data) => {
   return db.orm.public.Task.create(data);
 };
-// export const getAllTask = async (
-//   completedTask,
-//   pageNumber,
-//   limitNumber,
-//   userId
-// ) => {
-//   const offset = (pageNumber - 1) * limitNumber;
-//   const query = {};
 
-//   console.log("hello from task service");
+export const getTaskById = async (id,  userId  ) => {
+  return db.orm.public.Task.where({id,userId:userId}).first();
+};
+export const deleteTask = async (id) => {
+  return db.orm.public.Task.where({ id }).delete();
+};
+export const updateTask = async (id, userId,data) => {
+  return db.orm.public.Task.where({ id ,userId:userId}).update(data);
+};
+export const getAllTask = async ( role,userId,completed,page1 = 1,limit1 = 10,order) => {
 
-//   // if (userId) query.userId = userId;
-//   // if (completedTask !== undefined) query.completed = completedTask;
+  if (order !== undefined || completed !== undefined || page1 || limit1) {
 
-//   return db.orm.public.Task.all();
-// };
-// export const getTaskById = async (id) => {
-//   return db.orm.public.Task.where({ id }).first();
-// };
-// export const deleteTask = async (id) => {
-//   return db.orm.public.Task.where({ id }).delete();
-// };
-// export const updateTask = async (id, data) => {
-//   return db.orm.public.Task.where({ id }).update(data);
-// };
-export const getAllTask = async (page1 = 1, limit1 = 10) => {
-  // if (completed === undefined) {
-  if(page1&limit1){
+    const skip = (page1 - 1) * limit1;
 
-  
-  const skip = (page1 - 1) * limit1;
-  return await db.orm.public.Task.limit(limit1).offset(skip).all();
+    let task = db.orm.public.Task.limit(limit1).offset(skip)
+if (role !== "ADMIN") {
+  task = task.where({ userId: userId });
+}
+
+    if (completed !== undefined) {
+      task = task.where({ completed: completed });
+    }
+
+    if (order !== undefined) {
+      task = task.orderBy({ createdAt: order });
+    }
+
+    return await task
+      .include("user", (user) => user.select("name", "role", "email"))
+      .all();
   }
-
-
-  return await db.orm.public.Task.all();
 };
