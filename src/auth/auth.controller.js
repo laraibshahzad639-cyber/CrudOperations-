@@ -4,6 +4,7 @@ import argon2 from "argon2";
 import { errorMessage } from "../utils/errorMesage.js";
 import { sucessMessage } from "../utils/sucessMesage.js";
 import { loginUser, myUser, registerUser } from "./auth.service.js";
+import { getUserById } from "../user/user.service.js";
 
 export const registerUserController = async (req, res, next) => {
   try {
@@ -38,6 +39,7 @@ export const registerUserController = async (req, res, next) => {
   }
 };
 export const loginController = async (req, res, next) => {
+ 
   try {
     const { email, password } = req.body;
 
@@ -53,6 +55,11 @@ export const loginController = async (req, res, next) => {
       console.log("Database user role:", user.role);
       return errorMessage(res, 404, "User not found");
     }
+    if(user.isActive==false){
+      return errorMessage(res,403,
+        "Your account hasbeen deactivated"
+      )
+    }
 
     const validPassword = await argon2.verify(user.password, password);
 
@@ -64,7 +71,7 @@ export const loginController = async (req, res, next) => {
     }
 
     const accessToken = jwt.sign(
-      { userId: user.id, role: user.role },
+      { userId: user.id, role: user.role,isActive:user.isActive},
       process.env.JWT_SECRET,
       {
         expiresIn: "2d",
@@ -110,3 +117,24 @@ export const myUserController = async (req, res, next) => {
     next(error);
   }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

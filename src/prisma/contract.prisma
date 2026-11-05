@@ -10,6 +10,7 @@ model User {
   email     String                     @unique
   password  String
   role      Role                       @default(USER)
+  isActive  Boolean @default(true)
   tasks     Task[]
   createdAt TimestamptzString          @default(now())
   updatedAt temporal.updatedAtString()

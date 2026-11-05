@@ -7,7 +7,10 @@ import {
   deleteUsers,
   updatedUserRole,
   createUser,
+  updateUserstatus,
+  changePassword,
 } from "./user.service.js";
+import argon2 from "argon2";
 
 export const getUserController = async (req, res) => {
   try {
@@ -139,3 +142,64 @@ export const updateUserRoleController = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateUserstatusController = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { isActive } = req.body;
+
+    const user = await getUserById(id);
+
+    if (!user) {
+      return errorMessage(res, 404, "User not found");
+    }
+
+    const activeUser = await updateUserstatus(id, {
+      isActive: isActive
+    });
+
+    if (!activeUser) {
+      return errorMessage(res, 404, "Active user not found");
+    }
+
+   
+    return sucessMessage(res,200,"User deactivated sucessfully ",activeUser)
+
+  } catch (error) {
+    console.error("check error", error);
+    next(error);
+  }
+};
+export const changePasswordController=async(req,res,next)=>{
+  try{
+    const {id}=req.params
+     const {curentpassword,newpassword,confirmpassword}=req.body
+     if(!curentpassword||!newpassword||!confirmpassword){
+      return errorMessage(res,400,"curentpassword,newpaassword and confirmpassword are required")
+     }
+     if(!curentpassword){
+      return errorMessage(res,404,"curent password not found ")
+     }
+     if(newpassword!==confirmpassword){
+      return errorMessage(res,400,"Password not match")
+     }
+     const user = await getUserById(id)
+     console.log(user.email);
+      console.log(await argon2.verify(user.password, "abc112345"));
+
+     if(!user){
+      return errorMessage(res,404,"User not found ")
+     }
+     const isValidPassword=await argon2.verify(user.password,curentpassword);
+     if(!isValidPassword){
+       return errorMessage(res,401,"password is incorrect")
+     }
+      await changePassword(id, newpassword);
+
+  return sucessMessage(res, 200, "Password updated successfully", null);
+  }
+  catch(error){
+    console.error("check error",error)
+    next(error)
+  }
+}

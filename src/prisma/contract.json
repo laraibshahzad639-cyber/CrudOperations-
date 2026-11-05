@@ -89,8 +89,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["userId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -149,6 +153,13 @@
                   "kind": "scalar"
                 }
               },
+              "isActive": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
               "name": {
                 "nullable": false,
                 "type": {
@@ -188,8 +199,12 @@
               "tasks": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": ["id"],
-                  "targetFields": ["userId"]
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
                 },
                 "to": {
                   "model": "Task",
@@ -207,6 +222,9 @@
                 },
                 "id": {
                   "column": "id"
+                },
+                "isActive": {
+                  "column": "isActive"
                 },
                 "name": {
                   "column": "name"
@@ -286,12 +304,16 @@
                     "name": "Task_userId_idx_a489d58a"
                   },
                   "source": {
-                    "columns": ["userId"],
+                    "columns": [
+                      "userId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "Task"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "User"
                   }
@@ -299,20 +321,27 @@
               ],
               "indexes": [
                 {
-                  "columns": ["userId", "createdAt", "completed"],
-                  "name": "Task_userId_createdAt_completed_idx_3eefd6d2",
-                  "prefix": "Task_userId_createdAt_completed_idx",
+                  "columns": [
+                    "userId",
+                    "createdAt"
+                  ],
+                  "name": "Task_userId_createdAt_idx_f726f04a",
+                  "prefix": "Task_userId_createdAt_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["userId"],
+                  "columns": [
+                    "userId"
+                  ],
                   "name": "Task_userId_idx_a489d58a",
                   "prefix": "Task_userId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": []
             },
@@ -342,6 +371,15 @@
                 "id": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
+                  "nullable": false
+                },
+                "isActive": {
+                  "codecId": "pg/bool@1",
+                  "dataType": "pg/bool",
+                  "default": {
+                    "kind": "literal",
+                    "value": true
+                  },
                   "nullable": false
                 },
                 "name": {
@@ -378,18 +416,24 @@
               "foreignKeys": [],
               "indexes": [
                 {
-                  "columns": ["createdAt"],
+                  "columns": [
+                    "createdAt"
+                  ],
                   "name": "User_createdAt_idx_9575dbd7",
                   "prefix": "User_createdAt_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["email"]
+                  "columns": [
+                    "email"
+                  ]
                 }
               ]
             }
@@ -397,7 +441,10 @@
           "valueSet": {
             "Role": {
               "kind": "valueSet",
-              "values": ["ADMIN", "USER"]
+              "values": [
+                "ADMIN",
+                "USER"
+              ]
             }
           }
         },
@@ -405,7 +452,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "e89e9ac43c1469361721ff2e7a8b8bfd72580104abe33db9afb6b2a4ea813c3b"
+    "storageHash": "08e65e94e40c040380a9daf3b405015a35fb2f9364f84ceb0648edf533a3aa6b"
   },
   "execution": {
     "executionHash": "9842ada760566dc68912dd8467d6a2eb7297293628fa1463014d6791d202c250",

@@ -1,4 +1,5 @@
 import { db } from "../prisma/db.ts";
+import argon2 from "argon2";
 
 export const getUsers = async (limitNumber, pageNumber) => {
   const offset = (pageNumber - 1) * limitNumber;
@@ -21,5 +22,15 @@ export const createUser = async (data) => {
 export const updatedUserRole = async (id, role) => {
   return await db.orm.public.User.where({ id }).update({
     role: role,
+  });
+};
+export const updateUserstatus=async(id, data)=>{
+  return db.orm.public.User.where({id}).update(data)
+}
+export const changePassword = async (id, newpassword) => {
+  const hashedPassword = await argon2.hash(newpassword);
+
+  return db.orm.public.User.where({ id }).update({
+    password: hashedPassword,
   });
 };
