@@ -21,6 +21,23 @@
     "namespaces": {
       "public": {
         "enum": {
+          "Priority": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "HIGH",
+                "value": "HIGH"
+              },
+              {
+                "name": "LOW",
+                "value": "LOW"
+              },
+              {
+                "name": "MEDIUM",
+                "value": "MEDIUM"
+              }
+            ]
+          },
           "Role": {
             "codecId": "pg/text@1",
             "members": [
@@ -86,12 +103,8 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": [
-                    "taskId"
-                  ],
-                  "targetFields": [
-                    "id"
-                  ]
+                  "localFields": ["taskId"],
+                  "targetFields": ["id"]
                 },
                 "to": {
                   "model": "Task",
@@ -102,12 +115,8 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": [
-                    "userId"
-                  ],
-                  "targetFields": [
-                    "id"
-                  ]
+                  "localFields": ["userId"],
+                  "targetFields": ["id"]
                 },
                 "to": {
                   "model": "User",
@@ -170,6 +179,19 @@
                   "kind": "scalar"
                 }
               },
+              "priority": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "Priority",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
               "title": {
                 "nullable": false,
                 "type": {
@@ -196,12 +218,8 @@
               "comments": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": [
-                    "id"
-                  ],
-                  "targetFields": [
-                    "taskId"
-                  ]
+                  "localFields": ["id"],
+                  "targetFields": ["taskId"]
                 },
                 "to": {
                   "model": "Comment",
@@ -212,12 +230,8 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": [
-                    "userId"
-                  ],
-                  "targetFields": [
-                    "id"
-                  ]
+                  "localFields": ["userId"],
+                  "targetFields": ["id"]
                 },
                 "to": {
                   "model": "User",
@@ -238,6 +252,9 @@
                 },
                 "id": {
                   "column": "id"
+                },
+                "priority": {
+                  "column": "priority"
                 },
                 "title": {
                   "column": "title"
@@ -322,12 +339,8 @@
               "comments": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": [
-                    "id"
-                  ],
-                  "targetFields": [
-                    "userId"
-                  ]
+                  "localFields": ["id"],
+                  "targetFields": ["userId"]
                 },
                 "to": {
                   "model": "Comment",
@@ -337,12 +350,8 @@
               "tasks": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": [
-                    "id"
-                  ],
-                  "targetFields": [
-                    "userId"
-                  ]
+                  "localFields": ["id"],
+                  "targetFields": ["userId"]
                 },
                 "to": {
                   "model": "Task",
@@ -433,16 +442,12 @@
                     "name": "Comment_taskId_idx_4965c936"
                   },
                   "source": {
-                    "columns": [
-                      "taskId"
-                    ],
+                    "columns": ["taskId"],
                     "namespaceId": "public",
                     "tableName": "Comment"
                   },
                   "target": {
-                    "columns": [
-                      "id"
-                    ],
+                    "columns": ["id"],
                     "namespaceId": "public",
                     "tableName": "Task"
                   }
@@ -452,16 +457,12 @@
                     "name": "Comment_userId_idx_a489d58a"
                   },
                   "source": {
-                    "columns": [
-                      "userId"
-                    ],
+                    "columns": ["userId"],
                     "namespaceId": "public",
                     "tableName": "Comment"
                   },
                   "target": {
-                    "columns": [
-                      "id"
-                    ],
+                    "columns": ["id"],
                     "namespaceId": "public",
                     "tableName": "User"
                   }
@@ -469,30 +470,31 @@
               ],
               "indexes": [
                 {
-                  "columns": [
-                    "taskId"
-                  ],
+                  "columns": ["taskId"],
                   "name": "Comment_taskId_idx_4965c936",
                   "prefix": "Comment_taskId_idx",
                   "unique": false
                 },
                 {
-                  "columns": [
-                    "userId"
-                  ],
+                  "columns": ["userId"],
                   "name": "Comment_userId_idx_a489d58a",
                   "prefix": "Comment_userId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": [
-                  "id"
-                ]
+                "columns": ["id"]
               },
               "uniques": []
             },
             "Task": {
+              "checks": [
+                {
+                  "expression": "\"priority\" IN ('HIGH', 'LOW', 'MEDIUM')",
+                  "name": "Task_priority_check_aba1fc9a",
+                  "prefix": "Task_priority_check"
+                }
+              ],
               "columns": {
                 "completed": {
                   "codecId": "pg/bool@1",
@@ -522,6 +524,21 @@
                   "dataType": "pg/text",
                   "nullable": false
                 },
+                "priority": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "default": {
+                    "kind": "literal",
+                    "value": "MEDIUM"
+                  },
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "Priority",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
                 "title": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
@@ -544,16 +561,12 @@
                     "name": "Task_userId_idx_a489d58a"
                   },
                   "source": {
-                    "columns": [
-                      "userId"
-                    ],
+                    "columns": ["userId"],
                     "namespaceId": "public",
                     "tableName": "Task"
                   },
                   "target": {
-                    "columns": [
-                      "id"
-                    ],
+                    "columns": ["id"],
                     "namespaceId": "public",
                     "tableName": "User"
                   }
@@ -561,27 +574,20 @@
               ],
               "indexes": [
                 {
-                  "columns": [
-                    "userId",
-                    "createdAt"
-                  ],
+                  "columns": ["userId", "createdAt"],
                   "name": "Task_userId_createdAt_idx_f726f04a",
                   "prefix": "Task_userId_createdAt_idx",
                   "unique": false
                 },
                 {
-                  "columns": [
-                    "userId"
-                  ],
+                  "columns": ["userId"],
                   "name": "Task_userId_idx_a489d58a",
                   "prefix": "Task_userId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": [
-                  "id"
-                ]
+                "columns": ["id"]
               },
               "uniques": []
             },
@@ -656,35 +662,30 @@
               "foreignKeys": [],
               "indexes": [
                 {
-                  "columns": [
-                    "createdAt"
-                  ],
+                  "columns": ["createdAt"],
                   "name": "User_createdAt_idx_9575dbd7",
                   "prefix": "User_createdAt_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": [
-                  "id"
-                ]
+                "columns": ["id"]
               },
               "uniques": [
                 {
-                  "columns": [
-                    "email"
-                  ]
+                  "columns": ["email"]
                 }
               ]
             }
           },
           "valueSet": {
+            "Priority": {
+              "kind": "valueSet",
+              "values": ["HIGH", "LOW", "MEDIUM"]
+            },
             "Role": {
               "kind": "valueSet",
-              "values": [
-                "ADMIN",
-                "USER"
-              ]
+              "values": ["ADMIN", "USER"]
             }
           }
         },
@@ -692,7 +693,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "aacbf4580454e74cf7e593ab15aa9d5af31cb13e4a036576fd1158439fd3d7dd"
+    "storageHash": "1b7aeae62c53d8da0d448fd74740eb85f1c1933f48d05b190f33674a48dfb392"
   },
   "execution": {
     "executionHash": "c121fdccd72250ec67498ef5a031cf17be961687ad7346af00f4762c4b9d2185",

@@ -1,4 +1,4 @@
-import { db } from "./db.ts"; 
+import { db } from "./db.ts";
 import argon2 from "argon2";
 
 async function main() {
@@ -6,20 +6,22 @@ async function main() {
 
   const adminEmail = process.env.ADMIN_EMAIL || "admin@example.com";
   const rawPassword = process.env.ADMIN_PASSWORD || "admin123";
-  
+
   console.log("Hashing admin password...");
   const hashedPassword = await argon2.hash(rawPassword);
 
   console.log(" Checking if Admin already exists...");
-  
-  const existingAdmin = await db.orm.public.User.where({ email: adminEmail }).first();
+
+  const existingAdmin = await db.orm.public.User.where({
+    email: adminEmail,
+  }).first();
 
   if (!existingAdmin) {
     await db.orm.public.User.create({
       name: "System Admin",
       email: adminEmail,
       password: hashedPassword,
-      role: "ADMIN", 
+      role: "ADMIN",
     });
     console.log(` Admin account created successfully: ${adminEmail}`);
   } else {

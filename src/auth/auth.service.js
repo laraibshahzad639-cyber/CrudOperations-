@@ -8,4 +8,3 @@ export const loginUser = async (email) => {
 export const myUser = async (userId) => {
   return await db.orm.public.User.where({ id: userId }).first();
 };
-

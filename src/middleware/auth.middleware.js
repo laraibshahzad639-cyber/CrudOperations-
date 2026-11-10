@@ -13,7 +13,7 @@ export const authenticationMiddleware = async (req, res, next) => {
     return res.status(401).json({
       status: false,
       message: "Authentication required",
-    });                                                                                                                                                                                                                     
+    });
   }
 
   if (!process.env.JWT_SECRET) {
@@ -23,35 +23,29 @@ export const authenticationMiddleware = async (req, res, next) => {
       status: false,
       message: "Server configuration error",
     });
-
-
   }
- 
 
   try {
     const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
 
     const user = await getUserById(decoded.userId);
-    
-    if(!user){
-      return errorMessage(res,404,"User Not found ");
+
+    if (!user) {
+      return errorMessage(res, 404, "User Not found ");
     }
-    
-    if(user.isActive == false){
-      return errorMessage(res,403,
-        "Your account hasbeen deactivated"
-      );
+
+    if (user.isActive == false) {
+      return errorMessage(res, 403, "Your account hasbeen deactivated");
     }
 
     console.log("Decoded token:", decoded);
 
     req.user = {
-
       userId: decoded.userId,
-      taskId:decoded.taskId,
+      taskId: decoded.taskId,
 
       role: decoded.role,
-      isActive:decoded.isActive
+      isActive: decoded.isActive,
     };
 
     console.log("User  Role:", req.user.role);
@@ -66,5 +60,3 @@ export const authenticationMiddleware = async (req, res, next) => {
     });
   }
 };
-
-

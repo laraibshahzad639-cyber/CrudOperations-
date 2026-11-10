@@ -22,7 +22,7 @@ const PORT = process.env.PORT || 4000;
 app.use("/api/users", router);
 app.use("/api/auth", route);
 app.use("/api/tasks", routes);
-app.use("/api/comments",router1)
+app.use("/api/comments", router1);
 
 app.use(notFoundMiddleware);
 app.use(errorhandlerMiddleware);

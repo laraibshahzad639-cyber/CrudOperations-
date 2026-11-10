@@ -25,6 +25,11 @@ router.patch(
   isAdmin,
   updateUserRoleController
 );
-router.patch("/:id/deactive",   authenticationMiddleware,  isAdmin,updateUserstatusController)
-router.patch("/:id/password",changePasswordController)
+router.patch(
+  "/:id/deactive",
+  authenticationMiddleware,
+  isAdmin,
+  updateUserstatusController
+);
+router.patch("/:id/password", changePasswordController);
 export { router };

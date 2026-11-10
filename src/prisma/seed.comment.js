@@ -19,7 +19,7 @@ async function seedCommentsOnly() {
     const oldComments = await db.orm.public.Comment.all();
     for (const comment of oldComments) {
       // Agar delete implementation strict instance parameter manti hai toh poora object pass karein
-      await db.orm.public.Comment.delete(comment); 
+      await db.orm.public.Comment.delete(comment);
     }
   } catch (deleteError) {
     console.log("ℹ Fallback batch delete strategy configuration running...");
@@ -28,13 +28,17 @@ async function seedCommentsOnly() {
   }
 
   let totalCommentsCreated = 0;
-  console.log(`📝 Total Tasks Found: ${allTasks.length}. Seeding rule-accurate comments...`);
+  console.log(
+    `📝 Total Tasks Found: ${allTasks.length}. Seeding rule-accurate comments...`
+  );
 
   for (const task of allTasks) {
     const taskOwner = allUsers.find((u) => u.id === task.userId);
 
     if (!taskOwner) {
-      console.warn(`⚠️ Warning: Task ID ${task.id} has no valid owner user. Skipping...`);
+      console.warn(
+        `⚠️ Warning: Task ID ${task.id} has no valid owner user. Skipping...`
+      );
       continue;
     }
 
@@ -44,13 +48,13 @@ async function seedCommentsOnly() {
     taskComments.push({
       content: `I am working on my assigned task: "${task.title}". Requirements look clear.`,
       taskId: task.id,
-      userId: taskOwner.id, 
+      userId: taskOwner.id,
     });
 
     taskComments.push({
       content: `Update: Making great progress here. Ready for review soon.`,
       taskId: task.id,
-      userId: taskOwner.id, 
+      userId: taskOwner.id,
     });
 
     // RULE 2: ADMIN can view, add, and delete comments on ANY task
@@ -58,7 +62,7 @@ async function seedCommentsOnly() {
       taskComments.push({
         content: `[Admin Review] Looks well tracked. Please complete this on time.`,
         taskId: task.id,
-        userId: adminUser.id, 
+        userId: adminUser.id,
       });
     }
 

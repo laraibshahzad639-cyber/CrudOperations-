@@ -2,23 +2,25 @@ import * as TaskService from "./task.service.js";
 import { sucessMessage } from "../utils/sucessMesage.js";
 import { errorMessage } from "../utils/errorMesage.js";
 import { db } from "../prisma/db.ts";
-// import { type } from "node:os";
-// import { error } from "node:console";
 
 export const createTaskController = async (req, res, next) => {
   try {
     console.log("Logged-in user:", req.user);
-    const { title, description, completed } = req.body;
+    const { title, description, completed, priority } = req.body;
 
-    if (!title || !description) {
-      console.error("check error", error);
-      return errorMessage(res, 400, "Tittle and description are required ");
+    if (!title || !description || !priority) {
+      return errorMessage(
+        res,
+        400,
+        "Tittle  description  and priority are required "
+      );
     }
 
     const data = {
       title,
       description,
       completed: completed ?? false,
+      priority: priority || "MEDIUM",
       userId: req.user.userId,
     };
 
@@ -67,9 +69,9 @@ export const getTaskByIdController = async (req, res, next) => {
 export const updateTaskController = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { title, description, completed } = req.body;
+    const { title, description, completed, priority } = req.body;
 
-    if (!title || !description) {
+    if (!title || !description || !priority) {
       return errorMessage(res, 400, "Tittle and description are required");
     }
 
@@ -79,7 +81,7 @@ export const updateTaskController = async (req, res, next) => {
       return errorMessage(res, 404, "Task Not Found");
     }
 
-    const data = { title, description, completed };
+    const data = { title, description, completed, priority };
 
     const updatedTask = await TaskService.updateTask(id, req.user.userId, data);
 
@@ -92,7 +94,7 @@ export const updateTaskController = async (req, res, next) => {
 
 export const getAllTaskController = async (req, res, next) => {
   try {
-    const { completed, page, limit, order } = req.query;
+    const { completed, page, limit, order, priority } = req.query;
 
     console.log("User role:", req.user.role);
     console.log("User ID:", req.user.userId);
@@ -105,10 +107,19 @@ export const getAllTaskController = async (req, res, next) => {
     console.log(`value of page is ${page1}, value of limit is ${limit1}`);
 
     let task;
+    if (
+      priority !== undefined &&
+      priority !== "LOW" &&
+      priority !== "MEDIUM" &&
+      priority !== "HIGH"
+    ) {
+      return errorMessage(res, 400, "Invalid priority");
+    }
 
     if (
       completed === "true" ||
       completed === "false" ||
+      priority !== undefined ||
       page ||
       limit ||
       order
@@ -117,6 +128,7 @@ export const getAllTaskController = async (req, res, next) => {
         req.user.role,
         req.user.userId,
         completed === "true" ? true : completed === "false" ? false : undefined,
+        priority,
         page1,
         limit1,
         order

@@ -2,6 +2,12 @@
 enum Role {
   ADMIN
   USER
+
+}
+enum Priority{
+  HIGH
+  LOW
+  MEDIUM
 }
 
 model User {
@@ -27,6 +33,7 @@ model Task {
   user        User                       @relation(fields: [userId], references: [id])
   description String?
   comments  Comment[]
+   priority   Priority                       @default(MEDIUM)
   completed   Boolean                    @default(false)
   createdAt   TimestamptzString          @default(now())
   updatedAt   temporal.updatedAtString()
