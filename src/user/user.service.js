@@ -4,8 +4,12 @@ import argon2 from "argon2";
 export const getUsers = async (limitNumber, pageNumber) => {
   const offset = (pageNumber - 1) * limitNumber;
 
-  return await db.orm.public.User.limit(limitNumber).offset(offset).all();
-};
+  return await db.orm.public.User
+    .include("tasks", (task) => task.select("title", "description",).include("comments",(comment)=>comment.select("content")))
+    .offset(offset)
+    .all();
+}
+
 export const getUserById = async (id) => {
   return await db.orm.public.User.where({ id }).first();
 };

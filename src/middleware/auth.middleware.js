@@ -2,9 +2,8 @@ import jwt from "jsonwebtoken";
 import { sucessMessage } from "../utils/sucessMesage.js";
 import { errorMessage } from "../utils/errorMesage.js";
 import { getUserById } from "../user/user.service.js";
-import { decode } from "node:punycode";
+// import { decode } from "node:punycode";
 
-// 🔴 Added 'async' right here so 'await' can be used inside this function
 export const authenticationMiddleware = async (req, res, next) => {
   console.log("1. Authentication middleware called");
 
@@ -14,7 +13,7 @@ export const authenticationMiddleware = async (req, res, next) => {
     return res.status(401).json({
       status: false,
       message: "Authentication required",
-    });
+    });                                                                                                                                                                                                                     
   }
 
   if (!process.env.JWT_SECRET) {
@@ -24,18 +23,20 @@ export const authenticationMiddleware = async (req, res, next) => {
       status: false,
       message: "Server configuration error",
     });
+
+
   }
  
 
   try {
     const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+
     const user = await getUserById(decoded.userId);
     
     if(!user){
       return errorMessage(res,404,"User Not found ");
     }
     
-    // 🔴 Changed 'isActive' to 'user.isActive' so it reads correctly from your database object
     if(user.isActive == false){
       return errorMessage(res,403,
         "Your account hasbeen deactivated"
@@ -45,12 +46,15 @@ export const authenticationMiddleware = async (req, res, next) => {
     console.log("Decoded token:", decoded);
 
     req.user = {
+
       userId: decoded.userId,
+      taskId:decoded.taskId,
+
       role: decoded.role,
       isActive:decoded.isActive
     };
 
-    console.log("User Role:", req.user.role);
+    console.log("User  Role:", req.user.role);
 
     return next();
   } catch (error) {
@@ -62,3 +66,5 @@ export const authenticationMiddleware = async (req, res, next) => {
     });
   }
 };
+
+

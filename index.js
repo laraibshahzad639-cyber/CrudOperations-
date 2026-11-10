@@ -4,10 +4,10 @@ import dotenv from "dotenv";
 import { routes } from "./src/task/task.route.js";
 import { notFoundMiddleware } from "./src/middleware/notfound.middleeware.js";
 import { errorhandlerMiddleware } from "./src/middleware/errorhandler.middleware.js";
-import user from "./src/user/user.js";
 import { router } from "./src/user/user.route.js";
 import { route } from "./src/auth/auth.route.js";
 import cookieParser from "cookie-parser";
+import { router1 } from "./src/comment/comment.route.js";
 // import { authorize } from "./src/middleware/role.middleware.js";
 dotenv.config();
 
@@ -22,6 +22,7 @@ const PORT = process.env.PORT || 4000;
 app.use("/api/users", router);
 app.use("/api/auth", route);
 app.use("/api/tasks", routes);
+app.use("/api/comments",router1)
 
 app.use(notFoundMiddleware);
 app.use(errorhandlerMiddleware);

@@ -23,7 +23,7 @@ export const getAllTask = async (
   if (order !== undefined || completed !== undefined || page1 || limit1) {
     const skip = (page1 - 1) * limit1;
 
-    let task = db.orm.public.Task.limit(limit1).offset(skip);
+    let task = db.orm.public.Task.include("comments",(comments)=>comments.select("content")).limit(limit1).offset(skip);
     if (role !== "ADMIN") {
       task = task.where({ userId: userId });
     }

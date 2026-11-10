@@ -5,18 +5,20 @@ enum Role {
 }
 
 model User {
-  id        String                     @id @onCreate(uuid())
+  id        String              @id @onCreate(uuid())
   name      String
-  email     String                     @unique
+  email     String              @unique
   password  String
-  role      Role                       @default(USER)
-  isActive  Boolean @default(true)
+  role      Role                @default(USER)
+  isActive  Boolean             @default(true)
   tasks     Task[]
-  createdAt TimestamptzString          @default(now())
+  comments  Comment[]
+  createdAt TimestamptzString   @default(now())
   updatedAt temporal.updatedAtString()
 
   @@index([createdAt])
 }
+
 
 model Task {
   id          String                     @id @onCreate(uuid())
@@ -24,9 +26,29 @@ model Task {
   userId      String
   user        User                       @relation(fields: [userId], references: [id])
   description String?
+  comments  Comment[]
   completed   Boolean                    @default(false)
   createdAt   TimestamptzString          @default(now())
   updatedAt   temporal.updatedAtString()
 
   @@index([userId, createdAt])
 }
+model Comment {
+  id        String              @id @onCreate(uuid())
+  content   String
+  taskId    String
+  userId    String
+  task      Task                @relation(fields: [taskId], references: [id])
+  user      User                @relation(fields: [userId], references: [id])
+  createdAt TimestamptzString   @default(now())
+  updatedAt temporal.updatedAtString()
+
+
+}
+
+
+
+
+
+
+
