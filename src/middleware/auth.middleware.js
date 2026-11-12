@@ -5,7 +5,7 @@ import { getUserById } from "../user/user.service.js";
 // import { decode } from "node:punycode";
 
 export const authenticationMiddleware = async (req, res, next) => {
-  console.log("1. Authentication middleware called");
+  // console.log("1. Authentication middleware called");
 
   const accessToken = req.cookies?.access_token;
 
@@ -38,7 +38,7 @@ export const authenticationMiddleware = async (req, res, next) => {
       return errorMessage(res, 403, "Your account hasbeen deactivated");
     }
 
-    console.log("Decoded token:", decoded);
+    // console.log("Decoded token:", decoded);
 
     req.user = {
       userId: decoded.userId,
@@ -48,11 +48,11 @@ export const authenticationMiddleware = async (req, res, next) => {
       isActive: decoded.isActive,
     };
 
-    console.log("User  Role:", req.user.role);
+    // console.log("User  Role:", req.user.role);
 
     return next();
   } catch (error) {
-    console.log("4. Authentication failed:", error.message);
+    // console.log("4. Authentication failed:", error.message);
 
     return res.status(401).json({
       status: false,

@@ -4,20 +4,39 @@ export const createTask = async (data) => {
 };
 
 export const getTaskById = async (id, userId) => {
-  return db.orm.public.Task.where({ id, userId: userId }).first();
+  // console.log("Service Task ID:", id);
+
+  const task = await db.orm.public.Task.where({ id }).first();
+
+  // console.log("Database Result:", task);
+
+  return task;
 };
 export const deleteTask = async (id) => {
-  return db.orm.public.Task.where({ id }).delete();
+  return await db.orm.public.Task.where({ id }).delete();
 };
-export const updateTask = async (id, userId, data) => {
-  return db.orm.public.Task.where({ id, userId: userId }).update(data);
+
+
+export const updateTask = async (id, userId, data, role) => {
+  console.log("Data sent to DB:", data);
+
+  if (role === "ADMIN") {
+    await db.orm.public.Task.where({ id }).update(data);
+  } else {
+    await db.orm.public.Task.where({ id, userId }).update(data);
+  }
+
+  return await getTaskById(id, userId);
 };
+
+
 
 export const getAllTask = async (
   role,
   userId,
   completed,
   priority,
+  status,
   page1 = 1,
   limit1 = 10,
   order
@@ -39,6 +58,11 @@ export const getAllTask = async (
   if (priority !== undefined) {
     task = task.where({ priority: priority });
   }
+  if (status !== undefined) {
+    // console.log("Test status")
+    task = task.where({ status: status });
+    // console.log("test status")
+  }
 
   if (order !== undefined) {
     console.log("Test service");
@@ -46,7 +70,7 @@ export const getAllTask = async (
       order === "desc" ? t.priority.desc() : t.priority.asc()
     );
 
-    console.log("Test service");
+    // console.log("Test service");
   }
 
   return await task
@@ -54,4 +78,38 @@ export const getAllTask = async (
     .offset(skip)
     .include("user", (user) => user.select("name", "role", "email"))
     .all();
+};
+
+export const checkStatusSummary = async (role, userId) => {
+  // console.log("test service ");
+
+  const summary = {
+    TODO: 0,
+    IN_PROGRESS: 0,
+    COMPLETED: 0,
+  };
+
+  // console.log("test object");
+
+  let tasks;
+
+  if (role === "ADMIN") {
+    tasks = await db.orm.public.Task.all();
+  } else {
+    tasks = await db.orm.public.Task.where({ userId: userId }).all();
+  }
+
+  // console.log("test query ");
+
+  for (let task of tasks) {
+    if (task.status == "TODO") {
+      summary.TODO++;
+    } else if (task.status == "IN_PROGRESS") {
+      summary.IN_PROGRESS++;
+    } else if (task.status == "COMPLETED") {
+      summary.COMPLETED++;
+    }
+  }
+
+  return summary;
 };

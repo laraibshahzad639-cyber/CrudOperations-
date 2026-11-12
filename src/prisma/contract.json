@@ -50,6 +50,23 @@
                 "value": "USER"
               }
             ]
+          },
+          "Status": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "TODO",
+                "value": "TODO"
+              },
+              {
+                "name": "IN_PROGRESS",
+                "value": "IN_PROGRESS"
+              },
+              {
+                "name": "COMPLETED",
+                "value": "COMPLETED"
+              }
+            ]
           }
         },
         "models": {
@@ -103,8 +120,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["taskId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "taskId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "Task",
@@ -115,8 +136,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["userId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -192,6 +217,19 @@
                   "plane": "domain"
                 }
               },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "Status",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
               "title": {
                 "nullable": false,
                 "type": {
@@ -218,8 +256,12 @@
               "comments": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": ["id"],
-                  "targetFields": ["taskId"]
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "taskId"
+                  ]
                 },
                 "to": {
                   "model": "Comment",
@@ -230,8 +272,12 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": ["userId"],
-                  "targetFields": ["id"]
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
                 },
                 "to": {
                   "model": "User",
@@ -255,6 +301,9 @@
                 },
                 "priority": {
                   "column": "priority"
+                },
+                "status": {
+                  "column": "status"
                 },
                 "title": {
                   "column": "title"
@@ -339,8 +388,12 @@
               "comments": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": ["id"],
-                  "targetFields": ["userId"]
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
                 },
                 "to": {
                   "model": "Comment",
@@ -350,8 +403,12 @@
               "tasks": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": ["id"],
-                  "targetFields": ["userId"]
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
                 },
                 "to": {
                   "model": "Task",
@@ -442,12 +499,16 @@
                     "name": "Comment_taskId_idx_4965c936"
                   },
                   "source": {
-                    "columns": ["taskId"],
+                    "columns": [
+                      "taskId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "Comment"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "Task"
                   }
@@ -457,12 +518,16 @@
                     "name": "Comment_userId_idx_a489d58a"
                   },
                   "source": {
-                    "columns": ["userId"],
+                    "columns": [
+                      "userId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "Comment"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "User"
                   }
@@ -470,20 +535,26 @@
               ],
               "indexes": [
                 {
-                  "columns": ["taskId"],
+                  "columns": [
+                    "taskId"
+                  ],
                   "name": "Comment_taskId_idx_4965c936",
                   "prefix": "Comment_taskId_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["userId"],
+                  "columns": [
+                    "userId"
+                  ],
                   "name": "Comment_userId_idx_a489d58a",
                   "prefix": "Comment_userId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": []
             },
@@ -493,6 +564,11 @@
                   "expression": "\"priority\" IN ('HIGH', 'LOW', 'MEDIUM')",
                   "name": "Task_priority_check_aba1fc9a",
                   "prefix": "Task_priority_check"
+                },
+                {
+                  "expression": "\"status\" IN ('TODO', 'IN_PROGRESS', 'COMPLETED')",
+                  "name": "Task_status_check_1498d4c6",
+                  "prefix": "Task_status_check"
                 }
               ],
               "columns": {
@@ -539,6 +615,21 @@
                     "plane": "storage"
                   }
                 },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "default": {
+                    "kind": "literal",
+                    "value": "TODO"
+                  },
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "Status",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
                 "title": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
@@ -561,12 +652,16 @@
                     "name": "Task_userId_idx_a489d58a"
                   },
                   "source": {
-                    "columns": ["userId"],
+                    "columns": [
+                      "userId"
+                    ],
                     "namespaceId": "public",
                     "tableName": "Task"
                   },
                   "target": {
-                    "columns": ["id"],
+                    "columns": [
+                      "id"
+                    ],
                     "namespaceId": "public",
                     "tableName": "User"
                   }
@@ -574,20 +669,27 @@
               ],
               "indexes": [
                 {
-                  "columns": ["userId", "createdAt"],
+                  "columns": [
+                    "userId",
+                    "createdAt"
+                  ],
                   "name": "Task_userId_createdAt_idx_f726f04a",
                   "prefix": "Task_userId_createdAt_idx",
                   "unique": false
                 },
                 {
-                  "columns": ["userId"],
+                  "columns": [
+                    "userId"
+                  ],
                   "name": "Task_userId_idx_a489d58a",
                   "prefix": "Task_userId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": []
             },
@@ -662,18 +764,24 @@
               "foreignKeys": [],
               "indexes": [
                 {
-                  "columns": ["createdAt"],
+                  "columns": [
+                    "createdAt"
+                  ],
                   "name": "User_createdAt_idx_9575dbd7",
                   "prefix": "User_createdAt_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": ["id"]
+                "columns": [
+                  "id"
+                ]
               },
               "uniques": [
                 {
-                  "columns": ["email"]
+                  "columns": [
+                    "email"
+                  ]
                 }
               ]
             }
@@ -681,11 +789,26 @@
           "valueSet": {
             "Priority": {
               "kind": "valueSet",
-              "values": ["HIGH", "LOW", "MEDIUM"]
+              "values": [
+                "HIGH",
+                "LOW",
+                "MEDIUM"
+              ]
             },
             "Role": {
               "kind": "valueSet",
-              "values": ["ADMIN", "USER"]
+              "values": [
+                "ADMIN",
+                "USER"
+              ]
+            },
+            "Status": {
+              "kind": "valueSet",
+              "values": [
+                "TODO",
+                "IN_PROGRESS",
+                "COMPLETED"
+              ]
             }
           }
         },
@@ -693,7 +816,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "1b7aeae62c53d8da0d448fd74740eb85f1c1933f48d05b190f33674a48dfb392"
+    "storageHash": "6a5b71dad98bd4b0be9bcf6176cc5b4152e6bb9ea698f7dd9e3255b10402e4c0"
   },
   "execution": {
     "executionHash": "c121fdccd72250ec67498ef5a031cf17be961687ad7346af00f4762c4b9d2185",
