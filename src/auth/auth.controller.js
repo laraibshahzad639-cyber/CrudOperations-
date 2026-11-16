@@ -1,3 +1,4 @@
+
 import { db } from "../prisma/db.ts";
 import jwt from "jsonwebtoken";
 import argon2 from "argon2";
@@ -10,11 +11,20 @@ export const registerUserController = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
 
-    if (!name || !email || !password) {
+    if (
+      typeof name !== "string" ||
+      typeof email !== "string" ||
+      typeof password !== "string" ||
+      !name.trim() ||
+      !email.trim() ||
+      !password.trim()
+    ) {
       return errorMessage(res, 400, "Name, Email and Password are required");
     }
 
-    const existingEmail = await loginUser(email);
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const existingEmail = await loginUser(normalizedEmail);
 
     if (existingEmail) {
       return errorMessage(res, 409, "Email already exists");
@@ -23,8 +33,8 @@ export const registerUserController = async (req, res, next) => {
     const hashedPassword = await argon2.hash(password);
 
     const data = {
-      name,
-      email,
+      name: name.trim(),
+      email: normalizedEmail,
       password: hashedPassword,
     };
 
@@ -38,24 +48,26 @@ export const registerUserController = async (req, res, next) => {
     next(error);
   }
 };
+
 export const loginController = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      // console.log("Database user role:", user.role);
+    if (
+      typeof email !== "string" ||
+      typeof password !== "string" ||
+      !email.trim() ||
+      !password
+    ) {
       return errorMessage(res, 400, "Email and Password are required");
     }
 
-    const user = await loginUser(email);
-    // console.log("Database user role:", user.role);
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const user = await loginUser(normalizedEmail);
 
     if (!user) {
-      // console.log("Database user role:", user.role);
-      return errorMessage(res, 404, "User not found");
-    }
-    if (user.isActive == false) {
-      return errorMessage(res, 403, "Your account hasbeen deactivated");
+      return errorMessage(res, 401, "Invalid email or password");
     }
 
     const validPassword = await argon2.verify(user.password, password);
@@ -63,6 +75,11 @@ export const loginController = async (req, res, next) => {
     if (!validPassword) {
       return errorMessage(res, 401, "Invalid email or password");
     }
+
+    if (!user.isActive) {
+      return errorMessage(res, 403, "Your account has been deactivated");
+    }
+
     if (!process.env.JWT_SECRET) {
       throw new Error("JWT_SECRET is not configured");
     }
@@ -72,10 +89,17 @@ export const loginController = async (req, res, next) => {
       process.env.JWT_SECRET,
       {
         expiresIn: "2d",
+        algorithm: "HS256",
       }
     );
 
-    res.cookie("access_token", accessToken, {});
+    res.cookie("access_token", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 2 * 24 * 60 * 60 * 1000,
+      path: "/",
+    });
 
     const { password: _password, ...safeUser } = user;
 
@@ -85,10 +109,17 @@ export const loginController = async (req, res, next) => {
     next(error);
   }
 };
+
 export const logoutController = async (req, res, next) => {
   try {
-    res.clearCookie("access_token");
-    return sucessMessage(res, 200, "Logout sucessfull");
+    res.clearCookie("access_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+    });
+
+    return sucessMessage(res, 200, "Logout successful");
   } catch (error) {
     next(error);
   }
@@ -97,8 +128,6 @@ export const logoutController = async (req, res, next) => {
 export const myUserController = async (req, res, next) => {
   try {
     const userId = req.user.userId;
-
-    // console.log("Authenticated user ID:", userId);
 
     const currentUser = await myUser(userId);
 
