@@ -39,8 +39,9 @@ model Task {
   user        User                       @relation(fields: [userId], references: [id])
   description String?
   comments  Comment[]
-   priority   Priority                       @default(MEDIUM)
-   status      Status @default(TODO)
+   priority   Priority                   @default(MEDIUM)
+   status      Status                    @default(TODO)
+   dueDate   DateTime?
   completed   Boolean                    @default(false)
   createdAt   TimestamptzString          @default(now())
   updatedAt   temporal.updatedAtString()

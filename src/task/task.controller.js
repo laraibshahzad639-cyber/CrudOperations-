@@ -2,12 +2,15 @@ import * as TaskService from "./task.service.js";
 import { sucessMessage } from "../utils/sucessMesage.js";
 import { errorMessage } from "../utils/errorMesage.js";
 import { db } from "../prisma/db.ts";
+
+
 import { getUserById } from "../user/user.service.js";
+
 
 export const createTaskController = async (req, res, next) => {
   try {
     // console.log("Logged-in user:", req.user);
-    const { title, description, completed, priority, status } = req.body;
+    const { title, description, completed, priority, status ,dueDate} = req.body;
 
     // if (!title || !description||!priority||!status) {
     //   return errorMessage(res, 400, "Tittle  description  priority  and status are required ");
@@ -19,6 +22,7 @@ export const createTaskController = async (req, res, next) => {
       completed: completed ?? false,
       priority,
       status,
+     dueDate: dueDate ? Temporal.Instant.from(dueDate) : null,
       userId: req.user.userId,
     };
 
@@ -70,10 +74,11 @@ export const getTaskByIdController = async (req, res, next) => {
   }
 };
 
+
 export const updateTaskController = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { title, description, completed, priority, status } = req.body;
+    const { title, description, completed, priority, status, dueDate } = req.body;
 
     const task = await TaskService.getTaskById(id, req.user.userId);
 
@@ -86,12 +91,30 @@ export const updateTaskController = async (req, res, next) => {
     if (title !== undefined) updateData.title = title.trim();
     if (description !== undefined) updateData.description = description.trim();
     if (priority !== undefined) updateData.priority = priority.trim().toUpperCase();
-  
+
+    // DueDate validation and update
+    if (dueDate !== undefined) {
+  if (dueDate === null) {
+    updateData.dueDate = null;
+  } else {
+    try {
+      const validDate = Temporal.Instant.from(dueDate);
+      updateData.dueDate = validDate;
+    } catch {
+      return errorMessage(res, 400, "Invalid dueDate");
+    }
+  }
+}
+
     if (completed !== undefined) {
       const isCompleted = completed === true || completed === "true";
 
-      if (completed !== true && completed !== false &&
-          completed !== "true" && completed !== "false") {
+      if (
+        completed !== true &&
+        completed !== false &&
+        completed !== "true" &&
+        completed !== "false"
+      ) {
         return errorMessage(res, 400, "Invalid completed value");
       }
 
@@ -108,20 +131,25 @@ export const updateTaskController = async (req, res, next) => {
       if (!["TODO", "IN_PROGRESS", "COMPLETED"].includes(cleanStatus)) {
         return errorMessage(res, 400, "Invalid status");
       }
-  if(task.status==="TODO"&&cleanStatus==="COMPLETED"){
-      return errorMessage(res, 400,"COMPLETED task cannot be moved back to TODO task  directly.")
-    }
+
+      if (task.status === "TODO" && cleanStatus === "COMPLETED") {
+        return errorMessage(
+          res,
+          400,
+          "COMPLETED task cannot be moved back to TODO task directly."
+        );
+      }
 
       updateData.status = cleanStatus;
       updateData.completed = cleanStatus === "COMPLETED";
     }
 
     const updatedTask = await TaskService.updateTask(
-  id,
-  req.user.userId,
-  updateData,
-  req.user.role
-);
+      id,
+      req.user.userId,
+      updateData,
+      req.user.role
+    );
 
     if (!updatedTask) {
       return errorMessage(res, 404, "Task Not Found");
@@ -213,6 +241,106 @@ export const checkStatusController = async (req, res, next) => {
     );
   } catch (error) {
     console.log("check erorr", error);
+    next(error);
+  }
+};
+export const getOverDueTasksController=async(req ,res,next)=>{
+  try{
+    const role=req.user.role;
+    const userId=req.user.userId
+    const overDueTask=await TaskService.getOverdueTask(role,userId)
+   if (overDueTask.length === 0) {
+      return errorMessage(res,404,"OverDue tasks not found")
+    }
+    return sucessMessage(res,200,"OverDue tasks fetched sucessfully ",overDueTask)
+    
+  }
+  catch(error){
+    console.log("check error",error)
+    next(error)
+  }
+}
+export const upcommingTasksController = async (req, res, next) => {
+  try {
+    const { days } = req.query;
+    const days1 = days === undefined ? 7 : Number(days);
+
+    if (!Number.isInteger(days1) || days1 < 1 || days1 > 30) {
+      return errorMessage(res, 400, "Days must be an integer between 1 and 30");
+    }
+
+    const userId = req.user.userId;
+    const role = req.user.role;
+
+    const getUpcomingTask = await TaskService.upcommingTasks(
+      userId,
+      role,
+      days1
+    );
+
+    return sucessMessage(
+      res,
+      200,
+      "Upcoming tasks fetched successfully",
+      getUpcomingTask
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+// export const extendDueDateController=async(req,res,next)=>{
+//   try{
+//     const {id}=req.params;
+//     const {days}=req.body;
+//     if(!days){
+//      return errorMessage(res,400,"Days is required")
+//     }
+
+//     if (!Number.isInteger(days1) || days1 < 1) {
+//       return errorMessage(res, 400, "Days must be a positive integer");
+//     }
+//     const updateDueDate= await  TaskService.extendDueDate(id,req.user.userId,days1,req.user.role)
+//     if(!updateDueDate){
+//       return errorMessage(res,404,"Task Not Found")
+//     }
+//     return sucessMessage(res,200,"Due Date extended successfully",updateDueDate)
+//   }
+//   catch(error){
+//     console.log("check error",error)
+//     next(error)
+//   }
+// }
+
+export const extendDueDateController = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { days } = req.body;
+
+    if (!days) {
+      return errorMessage(res, 400, "Days is required");
+    }
+
+    const days1 = Number(days);
+
+    if (!Number.isInteger(days1) || days1 < 1) {
+      return errorMessage(res, 400, "Days must be a positive integer");
+    }
+
+    const updateDueDate = await TaskService.extendDueDate(
+      id,
+      req.user.userId,
+      req.user.role,
+      days1
+    );
+
+    if (!updateDueDate) {
+      return errorMessage(res, 404, "Task Not Found");
+    }
+
+    return sucessMessage(res, 200, "Due Date extended successfully", updateDueDate);
+  }
+  catch (error) {
+    console.log("check error", error);
     next(error);
   }
 };

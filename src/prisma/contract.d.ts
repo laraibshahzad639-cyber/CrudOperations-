@@ -23,7 +23,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'6a5b71dad98bd4b0be9bcf6176cc5b4152e6bb9ea698f7dd9e3255b10402e4c0'>;
+  StorageHashBase<'2e5d827d4572a1fa3a5459b352fe5ecdff34e46b53dce06e14e9ece50cabfe02'>;
 export type ExecutionHash =
   ExecutionHashBase<'c121fdccd72250ec67498ef5a031cf17be961687ad7346af00f4762c4b9d2185'>;
 export type ProfileHash =
@@ -319,6 +319,7 @@ export namespace Models {
     completed: FieldOutputTypes['public']['Task']['completed'];
     createdAt: FieldOutputTypes['public']['Task']['createdAt'];
     description: FieldOutputTypes['public']['Task']['description'];
+    dueDate: FieldOutputTypes['public']['Task']['dueDate'];
     id: FieldOutputTypes['public']['Task']['id'];
     priority: FieldOutputTypes['public']['Task']['priority'];
     status: FieldOutputTypes['public']['Task']['status'];
@@ -475,6 +476,12 @@ type ContractBase = Omit<
                 readonly description: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly dueDate: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
                   readonly nullable: true;
                   readonly many: false;
                 };
@@ -742,6 +749,13 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly dueDate: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
               readonly id: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -799,6 +813,7 @@ type ContractBase = Omit<
                 readonly completed: { readonly column: 'completed' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly description: { readonly column: 'description' };
+                readonly dueDate: { readonly column: 'dueDate' };
                 readonly id: { readonly column: 'id' };
                 readonly priority: { readonly column: 'priority' };
                 readonly status: { readonly column: 'status' };

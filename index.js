@@ -8,6 +8,9 @@ import { router } from "./src/user/user.route.js";
 import { route } from "./src/auth/auth.route.js";
 import cookieParser from "cookie-parser";
 import { router1 } from "./src/comment/comment.route.js";
+import { Temporal, Intl, toTemporalInstant } from '@js-temporal/polyfill';
+globalThis.Temporal = Temporal;
+Date.prototype.toTemporalInstant = toTemporalInstant;
 // import { authorize } from "./src/middleware/role.middleware.js";
 dotenv.config();
 
