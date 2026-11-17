@@ -47,28 +47,38 @@ export const getUserByIdController = async (req, res, next) => {
   }
 };
 
-export const deleteUserController = async (req, res) => {
+
+export const deleteUserController = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const user = await getUserById(id);
-    if (!user) {
-      return res.status(404).json({
-        status: false,
-        message: "Users not found",
-      });
+    const { userId } = req.user;
+
+    if (!id || typeof id !== "string") {
+      return errorMessage(res, 400, "Invalid user ID");
     }
+
+    if (id === userId) {//Issue 13 add check to prevent user from deleting their own account
+      return errorMessage(res, 400, "You cannot delete your own account");
+    }
+
+    const user = await getUserById(id);
+
+    if (!user) {
+      return errorMessage(res, 404, "User not found");
+    }
+
     const deletedUser = await deleteUsers(id);
-    return res.status(200).json({
-      status: true,
-      message: "User deleted sucessfuly",
-    });
+
+    if (!deletedUser) {
+      return errorMessage(res, 404, "User not found");
+    }
+
+    return sucessMessage(res, 200, "User deleted successfully");
   } catch (error) {
-    return res.status(500).json({
-      status: false,
-      message: "Internal server error",
-    });
+    next(error);
   }
 };
+
 export const updateUserController = async (req, res) => {
   try {
     const { id } = req.params;

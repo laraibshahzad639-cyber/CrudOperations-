@@ -18,7 +18,7 @@ router.get("/", authenticationMiddleware, isAdmin,getUserController);// issue 12
 router.patch("/me/password", authenticationMiddleware, changePasswordController);
 router.get("/:id", authenticationMiddleware, isAdmin, getUserByIdController);
 
-router.delete("/", deleteUserController);
+router.delete("/:id", authenticationMiddleware, isAdmin, deleteUserController);
 router.patch("/:id", authenticationMiddleware, isAdmin, updateUserController);
 router.patch(
   "/:id/role",
