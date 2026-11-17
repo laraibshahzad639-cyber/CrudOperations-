@@ -7,19 +7,35 @@ export const createTask = async (data) => {
   return db.orm.public.Task.create(data);
 };
 
-export const getTaskById = async (id, userId) => {
-  // console.log("Service Task ID:", id);
+export const getTaskById = async (id, userId,role) => {
+const filter=role==="ADMIN"?{id}:{id,userId};
 
-  const task = await db.orm.public.Task.where({ id }).first();
+  const task = await db.orm.public.Task.where( filter ).first();
 
-  // console.log("Database Result:", task);
 
   return task;
 };
-export const deleteTask = async (id) => {
-  return await db.orm.public.Task.where({ id }).delete();
-};
 
+export const deleteTask = async (id, userId, role) => {
+
+  const filter = role === "ADMIN"
+    ? { id }
+    : { id, userId };
+
+  const task = await db.orm.public.Task
+    .where(filter)
+    .first();
+
+  if (!task) {
+    return null;
+  }
+
+  await db.orm.public.Task
+    .where(filter)
+    .delete();
+
+  return task;
+};
 
 export const updateTask = async (id, userId, data, role) => {
  
@@ -39,6 +55,7 @@ export const getAllTask = async (
   role,
   userId,
   completed,
+
   priority,
   status,
   page1 = 1,

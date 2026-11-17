@@ -35,35 +35,34 @@ export const createTaskController = async (req, res, next) => {
   }
 };
 
+
 export const deleteTaskController = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const task = await TaskService.getTaskById(id);
+    const { userId, role } = req.user;
 
-    if (!task) {
-      return errorMessage(res, 404, " Task Not Found ");
+    const deletedTask = await TaskService.deleteTask(id, userId, role);
+
+    if (!deletedTask) {
+      return errorMessage(res, 404, "Task Not Found");
     }
 
-    const deletetask = await TaskService.deleteTask(id);
-      console.log("Deleted Task Result:", deletetask);
-    return sucessMessage(res, 200, "Task Deleted Sucessfully");
+    return sucessMessage(res, 200, "Task Deleted Successfully");
   } catch (error) {
-    console.error("check ", error);
+    console.error("Delete Task Error:", error);
     next(error);
   }
 };
 export const getTaskByIdController = async (req, res, next) => {
   try {
     const { id } = req.params;
-    // console.log("Task ID:", id);
-    // console.log("Logged-in User ID:", req.user.userId);
-    // console.log("test  id ");
 
-    const task = await TaskService.getTaskById(id, req.user.userId);
+
+    const task = await TaskService.getTaskById(id, req.user.userId, req.user.role);//add role parameter to getTaskById function
 
     if (!task) {
-      // console.log("test id ");
+    
       return errorMessage(res, 404, "Task Not Found ");
     }
 
@@ -288,59 +287,25 @@ export const upcommingTasksController = async (req, res, next) => {
     next(error);
   }
 };
-// export const extendDueDateController=async(req,res,next)=>{
-//   try{
-//     const {id}=req.params;
-//     const {days}=req.body;
-//     if(!days){
-//      return errorMessage(res,400,"Days is required")
-//     }
-
-//     if (!Number.isInteger(days1) || days1 < 1) {
-//       return errorMessage(res, 400, "Days must be a positive integer");
-//     }
-//     const updateDueDate= await  TaskService.extendDueDate(id,req.user.userId,days1,req.user.role)
-//     if(!updateDueDate){
-//       return errorMessage(res,404,"Task Not Found")
-//     }
-//     return sucessMessage(res,200,"Due Date extended successfully",updateDueDate)
-//   }
-//   catch(error){
-//     console.log("check error",error)
-//     next(error)
-//   }
-// }
-
-export const extendDueDateController = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const { days } = req.body;
-
-    if (!days) {
-      return errorMessage(res, 400, "Days is required");
+export const extendDueDateController=async(req,res,next)=>{
+  try{
+    const {id}=req.params;
+    const {days}=req.body;
+    if(!days){
+     return errorMessage(res,400,"Days is required")
     }
-
-    const days1 = Number(days);
 
     if (!Number.isInteger(days1) || days1 < 1) {
       return errorMessage(res, 400, "Days must be a positive integer");
     }
-
-    const updateDueDate = await TaskService.extendDueDate(
-      id,
-      req.user.userId,
-      req.user.role,
-      days1
-    );
-
-    if (!updateDueDate) {
-      return errorMessage(res, 404, "Task Not Found");
+    const updateDueDate= await  TaskService.extendDueDate(id,req.user.userId,days1,req.user.role)
+    if(!updateDueDate){
+      return errorMessage(res,404,"Task Not Found")
     }
-
-    return sucessMessage(res, 200, "Due Date extended successfully", updateDueDate);
+    return sucessMessage(res,200,"Due Date extended successfully",updateDueDate)
   }
-  catch (error) {
-    console.log("check error", error);
-    next(error);
+  catch(error){
+    console.log("check error",error)
+    next(error)
   }
-};
+}

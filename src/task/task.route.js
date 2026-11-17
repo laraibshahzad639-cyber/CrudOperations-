@@ -25,7 +25,7 @@ routes.patch(
   authenticationMiddleware,
   TaskController.extendDueDateController
 );
-routes.delete("/:id", TaskController.deleteTaskController);
+routes.delete("/:id", authenticationMiddleware, TaskController.deleteTaskController);//add Athentication middleware to delete route
 routes.get("/", authenticationMiddleware, TaskController.getAllTaskController);
 
 
