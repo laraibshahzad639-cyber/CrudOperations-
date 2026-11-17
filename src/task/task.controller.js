@@ -38,7 +38,7 @@ export const createTaskController = async (req, res, next) => {
 
 export const deleteTaskController = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params;// add role parameters to deletefuction and also add authentication middleware to delete route in task.route.js
 
     const { userId, role } = req.user;
 

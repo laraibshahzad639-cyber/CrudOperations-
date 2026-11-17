@@ -9,27 +9,43 @@ export const addCommentsController = async (req, res, next) => {
   try {
     const { taskId } = req.params;
     const { content } = req.body;
-    const userId = req.user.userId;
+    const { userId, role } = req.user;
 
-    if (!content || !content.trim()) {
+
+    if (typeof content !== "string" || !content.trim()) {
       return errorMessage(res, 400, "Content required");
     }
 
+    const trimmedContent = content.trim();
+
+    if (trimmedContent.length > 2000) {
+      return errorMessage(res, 400, "Content cannot exceed 2000 characters");
+    }
+
+    
     const task = await getTaskById(taskId);
 
     if (!task) {
       return errorMessage(res, 404, "Task not found");
     }
 
-  
+    if (role !== "ADMIN" && task.userId !== userId) {
+      return errorMessage(
+        res,
+        403,
+        "You cannot comment on another user's task"
+      );
+    }
 
+  
     const addcomment = await addComment({
-      content,
+      content: trimmedContent,
       taskId,
       userId
     });
 
     return sucessMessage(res, 201, "Comment added successfully", addcomment);
+
   } catch (error) {
     next(error);
   }
