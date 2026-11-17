@@ -13,28 +13,20 @@ import {
 } from "./user.service.js";
 import argon2 from "argon2";
 
-export const getUserController = async (req, res) => {
+export const getUserController = async (req, res, next) => {
   try {
-    const { limit } = req.query;
-    const { page } = req.query;
-    const pageNumber = Number(page);
-    const limitNumber = Number(limit);
-    const offset = (pageNumber - 1) * limitNumber;
+    const pageNumber = Number(req.query.page) || 1;
+    const limitNumber = Math.min(Number(req.query.limit) || 10, 100);
 
-    const user = await getUsers(limitNumber, pageNumber);
+    const users = await getUsers(limitNumber, pageNumber);
 
-    const safeUsers = user.map(({ password, ...user }) => user);
-
-    res.status(200).json({
+    return res.status(200).json({
       status: true,
-      message: "User fetched sucessfully ",
-      data: safeUsers,
+      message: "User fetched successfully",
+      data: users,
     });
   } catch (error) {
-    res.status(404).json({
-      status: false,
-      message: "User not found",
-    });
+    next(error);
   }
 };
 export const getUserByIdController = async (req, res, next) => {

@@ -1,18 +1,23 @@
 import { db } from "../prisma/db.ts";
 import argon2 from "argon2";
 
-export const getUsers = async (limitNumber, pageNumber) => {
-  
+export const getUsers = async (limitNumber, pageNumber) => {//Issue 12 remove comments and tasks fromm service add pagination (solution remove sensitive data like comments and tasks from service layer and add pagination to get all users service)
   const offset = (pageNumber - 1) * limitNumber;
 
-  return await db.orm.public.User.include("tasks", (task) =>
-    task
-      .select("title", "description")
-      .include("comments", (comment) => comment.select("content"))
-  )
+  return await db.orm.public.User
+    .select(
+      "id",
+      "name",
+      "email",
+      "role",
+      "isActive",
+      "createdAt"
+    )
+    .limit(limitNumber)
     .offset(offset)
     .all();
 };
+
 
 export const getUserById = async (id) => {
 

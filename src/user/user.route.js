@@ -14,7 +14,7 @@ import { isAdmin } from "../middleware/role.middleware.js";
 import { authenticationMiddleware } from "../middleware/auth.middleware.js";
 const router = express.Router();
 router.post("/", createUserController);
-router.get("/", getUserController);
+router.get("/", authenticationMiddleware, isAdmin,getUserController);// issue 12 add authentication middleware and isAdmin middleware to get all users route
 router.patch("/me/password", authenticationMiddleware, changePasswordController);
 router.get("/:id", authenticationMiddleware, isAdmin, getUserByIdController);
 
