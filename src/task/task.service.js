@@ -39,16 +39,17 @@ export const deleteTask = async (id, userId, role) => {
 
 export const updateTask = async (id, userId, data, role) => {
  
+const filter=role==="ADMIN"?{id}:{id,userId};
+ return  await db.orm.public.Task.where(filter).update(data);
+//   if (role === "ADMIN") {
+//     await db.orm.public.Task.where({ id }).update(data);
+//   } else {
+//     await db.orm.public.Task.where({ id, userId }).update(data);
+//   }
 
-  if (role === "ADMIN") {
-    await db.orm.public.Task.where({ id }).update(data);
-  } else {
-    await db.orm.public.Task.where({ id, userId }).update(data);
-  }
-
-  return await getTaskById(id, userId);
-};
-
+//   return await getTaskById(id, userId);
+// };
+}
 
 
 export const getAllTask = async (

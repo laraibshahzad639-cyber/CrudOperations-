@@ -79,7 +79,7 @@ export const updateTaskController = async (req, res, next) => {
     const { id } = req.params;
     const { title, description, completed, priority, status, dueDate } = req.body;
 
-    const task = await TaskService.getTaskById(id, req.user.userId);
+    const task = await TaskService.getTaskById(id, req.user.userId, req.user.role); //add role parameter to getTaskById function
 
     if (!task) {
       return errorMessage(res, 404, "Task Not Found");
@@ -91,7 +91,7 @@ export const updateTaskController = async (req, res, next) => {
     if (description !== undefined) updateData.description = description.trim();
     if (priority !== undefined) updateData.priority = priority.trim().toUpperCase();
 
-    // DueDate validation and update
+  
     if (dueDate !== undefined) {
   if (dueDate === null) {
     updateData.dueDate = null;
