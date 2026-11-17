@@ -17,7 +17,6 @@ const filter=role==="ADMIN"?{id}:{id,userId};
 };
 
 export const deleteTask = async (id, userId, role) => {
-
   const filter = role === "ADMIN"
     ? { id }
     : { id, userId };
