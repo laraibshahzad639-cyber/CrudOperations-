@@ -38,7 +38,7 @@ export const createTaskController = async (req, res, next) => {
 
 export const deleteTaskController = async (req, res, next) => {
   try {
-    const { id } = req.params;// add role parameters to deletefuction and also add authentication middleware to delete route in task.route.js
+    const { id } = req.params;// add role parameters to deletefuction and also add authentication middleware to delete route in task.route.js 
 
     const { userId, role } = req.user;
 
@@ -77,7 +77,7 @@ export const getTaskByIdController = async (req, res, next) => {
 export const updateTaskController = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { title, description, completed, priority, status, dueDate } = req.body;
+    const { title, description, completed, priority, status, dueDate } = req.body || {};
 
     const task = await TaskService.getTaskById(id, req.user.userId, req.user.role); //add role parameter to getTaskById function
 
@@ -87,14 +87,39 @@ export const updateTaskController = async (req, res, next) => {
 
     const updateData = {};
 
-    if (title !== undefined) updateData.title = title.trim();
-    if (description !== undefined) updateData.description = description.trim();
-    if (priority !== undefined) updateData.priority = priority.trim().toUpperCase();
+if (title !== undefined) {
+  if (typeof title !== "string" || title.trim().length === 0) {
+    return errorMessage(res, 400, "Title must be a non-empty string");
+  }
+  updateData.title = title.trim();
+}
 
-  
-    if (dueDate !== undefined) {
+if (description !== undefined) {
+  if (description === null) {
+    updateData.description = null;
+  } else if (typeof description !== "string") {
+    return errorMessage(res, 400, "Description must be a string or null");
+  } else {
+    updateData.description = description.trim();
+  }
+}
+
+if (priority !== undefined) {
+  if (typeof priority !== "string") {
+    return errorMessage(res, 400, "Priority must be a string");
+  }
+  const cleanPriority = priority.trim().toUpperCase();
+  if (!["LOW", "MEDIUM", "HIGH"].includes(cleanPriority)) {
+    return errorMessage(res, 400, "Invalid priority");
+  }
+  updateData.priority = cleanPriority;
+}
+
+if (dueDate !== undefined) {
   if (dueDate === null) {
     updateData.dueDate = null;
+  } else if (typeof dueDate !== "string") {
+    return errorMessage(res, 400, "Invalid dueDate");
   } else {
     try {
       const validDate = Temporal.Instant.from(dueDate);
@@ -104,6 +129,7 @@ export const updateTaskController = async (req, res, next) => {
     }
   }
 }
+
 
     if (completed !== undefined) {
       const isCompleted = completed === true || completed === "true";
@@ -123,9 +149,11 @@ export const updateTaskController = async (req, res, next) => {
         updateData.status = isCompleted ? "COMPLETED" : "IN_PROGRESS";
       }
     }
-
-    if (status !== undefined) {
-      const cleanStatus = status.trim().toUpperCase();
+if (status !== undefined) {
+  if (typeof status !== "string") {
+    return errorMessage(res, 400, "Status must be a string");
+  }
+  const cleanStatus = status.trim().toUpperCase();
 
       if (!["TODO", "IN_PROGRESS", "COMPLETED"].includes(cleanStatus)) {
         return errorMessage(res, 400, "Invalid status");
