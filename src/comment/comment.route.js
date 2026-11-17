@@ -12,7 +12,7 @@ router1.post(
   authenticationMiddleware,
   addCommentsController
 );
-router1.get("/", authenticationMiddleware, getAllComments);
+router1.get("/:taskId/comments", authenticationMiddleware, getAllComments);
 router1.patch("/:id", authenticationMiddleware, updateCommentsController);
 router1.delete("/:id", authenticationMiddleware, deleteCommentsController);
 export { router1 };

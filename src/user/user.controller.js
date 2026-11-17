@@ -9,6 +9,7 @@ import {
   createUser,
   updateUserstatus,
   changePassword,
+  getUserCredentialsById
 } from "./user.service.js";
 import argon2 from "argon2";
 
@@ -124,18 +125,21 @@ export const updateUserRoleController = async (req, res, next) => {
     }
 
     const user = await getUserById(id);
+
+
     if (!user) {
       return errorMessage(res, 404, "User not found");
     }
 
     await updatedUserRole(id, role);
     const updatedUser = await getUserById(id);
+    const { password, ...safeUser } = updatedUser;
 
     return sucessMessage(
       res,
       200,
       "User role updated successfully",
-      updatedUser
+      safeUser
     );
   } catch (error) {
     console.error("Update user role error:", error);
@@ -161,46 +165,67 @@ export const updateUserstatusController = async (req, res, next) => {
     if (!activeUser) {
       return errorMessage(res, 404, "Active user not found");
     }
+  const { password, ...safeUser } = activeUser;
 
-    return sucessMessage(res, 200, "User deactivated sucessfully ", activeUser);
+    return sucessMessage(res, 200, "User deactivated sucessfully ", safeUser);
   } catch (error) {
     console.error("check error", error);
     next(error);
   }
 };
+
 export const changePasswordController = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const { curentpassword, newpassword, confirmpassword } = req.body;
-    if (!curentpassword || !newpassword || !confirmpassword) {
-      return errorMessage(
-        res,
-        400,
-        "curentpassword,newpaassword and confirmpassword are required"
-      );
+    const id = req.user.userId;
+
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    if (
+      !currentPassword ||
+      !newPassword ||
+      !confirmPassword
+    ) {
+      return errorMessage(res, 400, "All password fields are required");
     }
-    if (!curentpassword) {
-      return errorMessage(res, 404, "curent password not found ");
+
+    if (typeof currentPassword !== "string" ||
+        typeof newPassword !== "string" ||
+        typeof confirmPassword !== "string") {
+      return errorMessage(res, 400, "Passwords must be strings");
     }
-    if (newpassword !== confirmpassword) {
-      return errorMessage(res, 400, "Password not match");
+
+    if (newPassword.length < 8) {
+      return errorMessage(res, 400, "Password must be at least 8 characters");
     }
-    const user = await getUserById(id);
-    console.log(user.email);
-    console.log(await argon2.verify(user.password, "abc112345"));
+
+    if (newPassword !== confirmPassword) {
+      return errorMessage(res, 400, "Password does not match");
+    }
+
+    const user = await getUserCredentialsById(id);
 
     if (!user) {
-      return errorMessage(res, 404, "User not found ");
+      return errorMessage(res, 404, "User not found");
     }
-    const isValidPassword = await argon2.verify(user.password, curentpassword);
+
+    const isValidPassword = await argon2.verify(
+      user.password,
+      currentPassword
+    );
+
     if (!isValidPassword) {
-      return errorMessage(res, 401, "password is incorrect");
+      return errorMessage(res, 401, "Current password is incorrect");
     }
-    await changePassword(id, newpassword);
+
+    await changePassword(id, newPassword);
+
+    res.clearCookie("access_token");
 
     return sucessMessage(res, 200, "Password updated successfully", null);
+
   } catch (error) {
-    console.error("check error", error);
+    console.error("Password change error:", error);
     next(error);
   }
 };
+

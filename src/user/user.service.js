@@ -2,6 +2,7 @@ import { db } from "../prisma/db.ts";
 import argon2 from "argon2";
 
 export const getUsers = async (limitNumber, pageNumber) => {
+  
   const offset = (pageNumber - 1) * limitNumber;
 
   return await db.orm.public.User.include("tasks", (task) =>
@@ -14,10 +15,11 @@ export const getUsers = async (limitNumber, pageNumber) => {
 };
 
 export const getUserById = async (id) => {
+
   return await db.orm.public.User.where({ id }).first();
 };
 export const updateUsers = async (id, data) => {
-  return await db.orm.public.User.where({ id }).update(data);
+  return await db.orm.public.User.where({ id }).select("id","email","name","role","createdAt","updatedAt").update(data)
 };
 export const deleteUsers = async (id) => {
   return await db.orm.public.User.where({ id }).delete();
@@ -40,4 +42,7 @@ export const changePassword = async (id, newpassword) => {
   return db.orm.public.User.where({ id }).update({
     password: hashedPassword,
   });
+};
+export const getUserCredentialsById = async (id) => {
+  return db.orm.public.User.where({ id }).first();
 };

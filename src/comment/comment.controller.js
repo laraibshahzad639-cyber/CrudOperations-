@@ -34,20 +34,25 @@ export const addCommentsController = async (req, res, next) => {
     next(error);
   }
 };
-export const getAllComments = async (req, res, next) => {
+
+export const getAllComments = async (req, res, next) => {// add taskId parameter to the function,set default value of page is 1 and  default value of limit is 10, set maximum value of limit is 100, calculate offset based on page and limit
     try {
         const { taskId } = req.params;
         const { page, limit } = req.query;
 
-        const page1 = Number(page);
-        const limit1 = Number(limit);
+        const page1 = Number(page) || 1;
+        const limit1 = Math.min(Number(limit) || 10, 100);
 
         const offset = (page1 - 1) * limit1;
 
-        // console.log(`value of page is ${page1}, value of limit is ${limit1}`);
+        const task = await getTaskById(
+            taskId,
+            req.user.userId,
+            req.user.role
+        );
 
-        if (!page || !limit) {
-            return errorMessage(res, 400, "Page and limit are required");
+        if (!task) {
+            return errorMessage(res, 404, "Task not found");
         }
 
         const comments = await getComments(taskId, limit1, offset);
@@ -59,6 +64,7 @@ export const getAllComments = async (req, res, next) => {
         next(error);
     }
 };
+
 export const updateCommentsController=async(req,res,next)=>{
     try{
         const{id}=req.params
