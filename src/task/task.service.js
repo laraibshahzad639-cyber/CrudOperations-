@@ -100,8 +100,8 @@ export const getAllTask = async ({
     .all();
 };
 
+
 export const checkStatusSummary = async (role, userId) => {
-  // console.log("test service ");
 
   const summary = {
     TODO: 0,
@@ -109,30 +109,33 @@ export const checkStatusSummary = async (role, userId) => {
     COMPLETED: 0,
   };
 
-  // console.log("test object");
-
   let tasks;
 
   if (role === "ADMIN") {
-    tasks = await db.orm.public.Task.all();
+    tasks = db.orm.public.Task;
   } else {
-    tasks = await db.orm.public.Task.where({ userId: userId }).all();
+    tasks = db.orm.public.Task.where({ userId: userId });
   }
 
-  // console.log("test query ");
+  const result = await tasks
+    .groupBy("status")
+    .aggregate((aggregate) => ({
+      count: aggregate.count(),
+    }));
 
-  for (let task of tasks) {
-    if (task.status == "TODO") {
-      summary.TODO++;
-    } else if (task.status == "IN_PROGRESS") {
-      summary.IN_PROGRESS++;
-    } else if (task.status == "COMPLETED") {
-      summary.COMPLETED++;
+  for (let task of result) {
+    if (task.status === "TODO") {
+      summary.TODO = task.count;
+    } else if (task.status === "IN_PROGRESS") {
+      summary.IN_PROGRESS = task.count;
+    } else if (task.status === "COMPLETED") {
+      summary.COMPLETED = task.count;
     }
   }
 
   return summary;
 };
+
 export const getOverdueTask = async (role, userId) => {
 
   let task = db.orm.public.Task;
