@@ -149,6 +149,7 @@ export const updateUserRoleController = async (req, res, next) => {
   }
 };
 
+
 export const updateUserstatusController = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -160,6 +161,22 @@ export const updateUserstatusController = async (req, res, next) => {
       return errorMessage(res, 404, "User not found");
     }
 
+    if (typeof isActive !== "boolean") {
+      return errorMessage(res, 400, "isActive must be a boolean value");
+    }
+
+    if (req.user.userId === id && isActive === false) {
+      return errorMessage(res, 400, "You cannot deactivate your own account");
+    }
+
+    if (user.role === "ADMIN" && user.isActive && isActive === false) {
+      const adminCount = await countActiveAdmins();
+
+      if (adminCount <= 1) {
+        return errorMessage(res, 409, "Cannot deactivate the last active admin");
+      }
+    }
+
     const activeUser = await updateUserstatus(id, {
       isActive: isActive,
     });
@@ -167,9 +184,25 @@ export const updateUserstatusController = async (req, res, next) => {
     if (!activeUser) {
       return errorMessage(res, 404, "Active user not found");
     }
-  const { password, ...safeUser } = activeUser;
 
-    return sucessMessage(res, 200, "User deactivated sucessfully ", safeUser);
+    const safeUser = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isActive: isActive,
+    };
+
+    let message;
+
+    if (isActive === true) {
+      message = "User activated successfully";
+    } else {
+      message = "User deactivated successfully";
+    }
+
+    return sucessMessage(res, 200, message, safeUser);
+
   } catch (error) {
     console.error("check error", error);
     next(error);

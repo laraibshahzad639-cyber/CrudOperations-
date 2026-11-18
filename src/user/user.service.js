@@ -51,3 +51,8 @@ export const changePassword = async (id, newpassword) => {
 export const getUserCredentialsById = async (id) => {
   return db.orm.public.User.where({ id }).first();
 };
+export const countActiveAdmins = async () => {
+  return await db.orm.public.User
+    .where({ role: "ADMIN", isActive: true })
+    .count();
+};

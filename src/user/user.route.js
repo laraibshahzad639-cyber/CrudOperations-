@@ -18,7 +18,7 @@ router.get("/", authenticationMiddleware, isAdmin,getUserController);// issue 12
 router.patch("/me/password", authenticationMiddleware, changePasswordController);
 router.get("/:id", authenticationMiddleware, isAdmin, getUserByIdController);
 
-router.delete("/:id", authenticationMiddleware, isAdmin, deleteUserController);
+router.delete("/:id", authenticationMiddleware, isAdmin, deleteUserController);//Issue 13  id ,authentication middleware and isAdmin middleware added to delete user route
 router.patch("/:id", authenticationMiddleware, isAdmin, updateUserController);
 router.patch(
   "/:id/role",
@@ -26,11 +26,6 @@ router.patch(
   isAdmin,
   updateUserRoleController
 );
-router.patch(
-  "/:id/deactive",
-  authenticationMiddleware,
-  isAdmin,
-  updateUserstatusController
-);
+router.patch("/:id/status", authenticationMiddleware, isAdmin, updateUserstatusController);
 router.patch("/me/password", authenticationMiddleware, changePasswordController);
 export { router };
