@@ -159,7 +159,7 @@ if (status !== undefined) {
         return errorMessage(res, 400, "Invalid status");
       }
       const ALLOWED_TRANSITIONS = {
-        TODO: ["IN_PROGRESS", "COMPLETED"],
+        TODO: ["IN_PROGRESS", "COMPLETED"],//add allowed transitions for status update to prevent invalid transitions and only change if condition
         IN_PROGRESS: ["TODO", "COMPLETED"],
         COMPLETED: ["IN_PROGRESS"],
       };
@@ -204,54 +204,38 @@ export const getAllTaskController = async (req, res, next) => {
     const cleanPriority=priority?.trim().toUpperCase()
     const cleanStatus=status?.trim().toUpperCase()
     const cleanOrder=order?.trim().toUpperCase()
-  
-    // console.log("User role:", req.user.role);
-    // console.log("User ID:", req.user.userId);
-    // console.log("Priority received:", req.query.priority);
-
-    // console.log(`page is ${typeof page}, limit is ${typeof limit}`);
+    if(completed!==undefined && completed !== "true" && completed !== "false"){
+      return errorMessage(res,400,"Invalid completed value")
+    }
+    if(cleanStatus!==undefined&&cleanStatus!=="TODO"&&cleanStatus!=="IN_PROGRESS"&&cleanStatus!=="COMPLETED"){
+      return errorMessage(res,400,"Invalid status values")
+    }
+    if(cleanOrder!==undefined&&cleanOrder!=="ASC"&&cleanOrder!=="DESC"){
+      return errorMessage(res,400,"Invalid order values")
+    }
+  if(cleanPriority!==undefined&&cleanPriority!=="LOW"&&cleanPriority!=="MEDIUM"&&cleanPriority!=="HIGH"){
+    return errorMessage(res,400,"Invalid priority values")
+  }
+ 
 
     const page1 = Number(page) || 1;
     const limit1 = Number(limit) || 10;
 
-    // console.log(`value of page is ${page1}, value of limit is ${limit1}`);
+    
 
-    let task;
-    if (
-      cleanPriority!== undefined &&
-      cleanPriority!== "LOW" &&
-      cleanPriority !== "MEDIUM" &&
-       cleanPriority !== "HIGH"
-    ) {
-      return errorMessage(res, 400, "Invalid priority");
-    }
-
-    if (
-      completed=== "true" ||
-     completed=== "false" ||
-      cleanPriority !== undefined ||
-      page ||
-      limit ||
-      cleanOrder ||
-     cleanStatus == "TODO" ||
-     cleanStatus == "IN_PROGRESS" ||
-      cleanStatus== "COMPLETED"
-    ) {
-      task = await TaskService.getAllTask(
-        req.user.role,
-        req.user.userId,
-        completed === "true" ? true : completed === "false" ? false : undefined,
-       cleanPriority,
-        cleanStatus,
-        page1,
-        limit1,
-        cleanOrder === "asc" ? "asc" : cleanOrder === "desc" ? "desc" : undefined
-      );
-    } else {
-      task = await TaskService.getAllTask(req.user.role, req.user.userId);
-    }
+    const task = await TaskService.getAllTask({
+      role: req.user.role,
+      userId: req.user.userId,
+      completed: completed === undefined ? undefined : completed === "true",
+      priority: cleanPriority,
+      status: cleanStatus,
+      page1: Number(page) || 1,
+      limit1: Number(limit) || 10,
+      order: cleanOrder?.toLowerCase(),
+    });
 
     return sucessMessage(res, 200, "Tasks fetched successfully", task);
+
   } catch (error) {
     console.error("Get all tasks error:", error);
     return next(error);

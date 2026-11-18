@@ -51,17 +51,16 @@ const filter=role==="ADMIN"?{id}:{id,userId};
 }
 
 
-export const getAllTask = async (
+export const getAllTask = async ({
   role,
   userId,
   completed,
-
   priority,
   status,
   page1 = 1,
   limit1 = 10,
   order
-) => {
+}) => {
   const skip = (page1 - 1) * limit1;
 
   let task = db.orm.public.Task.include("comments", (comments) =>
