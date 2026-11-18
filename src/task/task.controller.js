@@ -158,15 +158,20 @@ if (status !== undefined) {
       if (!["TODO", "IN_PROGRESS", "COMPLETED"].includes(cleanStatus)) {
         return errorMessage(res, 400, "Invalid status");
       }
+      const ALLOWED_TRANSITIONS = {
+        TODO: ["IN_PROGRESS", "COMPLETED"],
+        IN_PROGRESS: ["TODO", "COMPLETED"],
+        COMPLETED: ["IN_PROGRESS"],
+      };
 
-      if (task.status === "TODO" && cleanStatus === "COMPLETED") {
+     const allowedStatuses = ALLOWED_TRANSITIONS[task.status] 
+     if (!allowedStatuses.includes(cleanStatus)) {
         return errorMessage(
           res,
-          400,
-          "COMPLETED task cannot be moved back to TODO task directly."
+          409,
+          `Invalid status transition from ${task.status} to ${cleanStatus}`
         );
       }
-
       updateData.status = cleanStatus;
       updateData.completed = cleanStatus === "COMPLETED";
     }

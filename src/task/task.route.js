@@ -16,6 +16,11 @@ routes.get(
   TaskController.getTaskByIdController
 );
 routes.patch(
+  "/:id",
+  authenticationMiddleware,
+  TaskController.updateTaskController
+);
+routes.patch(
   "/:id/status",
   authenticationMiddleware,
   TaskController.updateTaskController
