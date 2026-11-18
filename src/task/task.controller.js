@@ -7,22 +7,60 @@ import { db } from "../prisma/db.ts";
 import { getUserById } from "../user/user.service.js";
 
 
+
 export const createTaskController = async (req, res, next) => {
   try {
-    // console.log("Logged-in user:", req.user);
-    const { title, description, completed, priority, status ,dueDate} = req.body;
-
-    // if (!title || !description||!priority||!status) {
-    //   return errorMessage(res, 400, "Tittle  description  priority  and status are required ");
-    // }
-
-    const data = {
+    const {
       title,
       description,
-      completed: completed ?? false,
+      completed,
+      priority = "MEDIUM",
+      status = "TODO",
+      dueDate
+    } = req.body;
+
+  
+    if (!title || typeof title !== "string" || title.trim().length === 0) {
+      return errorMessage(res, 400, "Title is required");
+    }
+
+  
+    if (description !== undefined && description !== null && typeof description !== "string") {
+      return errorMessage(res, 400, "Description must be a string or null");
+    }
+
+  
+    const validPriorities = ["LOW", "MEDIUM", "HIGH"];
+
+    if (!validPriorities.includes(priority)) {
+      return errorMessage(res, 400, "Invalid priority");
+    }
+
+ 
+    const validStatus = ["TODO", "IN_PROGRESS", "COMPLETED"];
+
+    if (!validStatus.includes(status)) {
+      return errorMessage(res, 400, "Invalid status");
+    }
+
+    if (completed !== undefined && typeof completed !== "boolean") {
+      return errorMessage(res, 400, "Completed must be a boolean");
+    }
+
+
+    const taskCompleted = status === "COMPLETED";
+
+    if (completed !== undefined && completed !== taskCompleted) {
+      return errorMessage(res, 400, "Status and completed values cannot conflict");
+    }
+
+    const data = {
+      title: title.trim(),
+      description: description?.trim() ?? null,
+      completed: taskCompleted,
       priority,
       status,
-     dueDate: dueDate ? Temporal.Instant.from(dueDate) : null,
+      dueDate: dueDate ? Temporal.Instant.from(dueDate) : null,
       userId: req.user.userId,
     };
 
@@ -34,6 +72,7 @@ export const createTaskController = async (req, res, next) => {
     next(error);
   }
 };
+
 
 
 export const deleteTaskController = async (req, res, next) => {
@@ -225,7 +264,7 @@ export const getAllTaskController = async (req, res, next) => {
 
     const task = await TaskService.getAllTask({
       role: req.user.role,
-      userId: req.user.userId,
+      userId: req.user.userId,//ignore ivalid filter
       completed: completed === undefined ? undefined : completed === "true",
       priority: cleanPriority,
       status: cleanStatus,
