@@ -9,7 +9,7 @@ import {
   createUser,
   updateUserstatus,
   changePassword,
-  getUserCredentialsById
+  getUserCredentialsById,
 } from "./user.service.js";
 import argon2 from "argon2";
 
@@ -47,7 +47,6 @@ export const getUserByIdController = async (req, res, next) => {
   }
 };
 
-
 export const deleteUserController = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -57,7 +56,8 @@ export const deleteUserController = async (req, res, next) => {
       return errorMessage(res, 400, "Invalid user ID");
     }
 
-    if (id === userId) {//Issue 13 add check to prevent user from deleting their own account
+    if (id === userId) {
+      //Issue 13 add check to prevent user from deleting their own account
       return errorMessage(res, 400, "You cannot delete your own account");
     }
 
@@ -128,7 +128,6 @@ export const updateUserRoleController = async (req, res, next) => {
 
     const user = await getUserById(id);
 
-
     if (!user) {
       return errorMessage(res, 404, "User not found");
     }
@@ -137,18 +136,12 @@ export const updateUserRoleController = async (req, res, next) => {
     const updatedUser = await getUserById(id);
     const { password, ...safeUser } = updatedUser;
 
-    return sucessMessage(
-      res,
-      200,
-      "User role updated successfully",
-      safeUser
-    );
+    return sucessMessage(res, 200, "User role updated successfully", safeUser);
   } catch (error) {
     console.error("Update user role error:", error);
     next(error);
   }
 };
-
 
 export const updateUserstatusController = async (req, res, next) => {
   try {
@@ -173,7 +166,11 @@ export const updateUserstatusController = async (req, res, next) => {
       const adminCount = await countActiveAdmins();
 
       if (adminCount <= 1) {
-        return errorMessage(res, 409, "Cannot deactivate the last active admin");
+        return errorMessage(
+          res,
+          409,
+          "Cannot deactivate the last active admin"
+        );
       }
     }
 
@@ -202,7 +199,6 @@ export const updateUserstatusController = async (req, res, next) => {
     }
 
     return sucessMessage(res, 200, message, safeUser);
-
   } catch (error) {
     console.error("check error", error);
     next(error);
@@ -215,17 +211,15 @@ export const changePasswordController = async (req, res, next) => {
 
     const { currentPassword, newPassword, confirmPassword } = req.body;
 
-    if (
-      !currentPassword ||
-      !newPassword ||
-      !confirmPassword
-    ) {
+    if (!currentPassword || !newPassword || !confirmPassword) {
       return errorMessage(res, 400, "All password fields are required");
     }
 
-    if (typeof currentPassword !== "string" ||
-        typeof newPassword !== "string" ||
-        typeof confirmPassword !== "string") {
+    if (
+      typeof currentPassword !== "string" ||
+      typeof newPassword !== "string" ||
+      typeof confirmPassword !== "string"
+    ) {
       return errorMessage(res, 400, "Passwords must be strings");
     }
 
@@ -243,10 +237,7 @@ export const changePasswordController = async (req, res, next) => {
       return errorMessage(res, 404, "User not found");
     }
 
-    const isValidPassword = await argon2.verify(
-      user.password,
-      currentPassword
-    );
+    const isValidPassword = await argon2.verify(user.password, currentPassword);
 
     if (!isValidPassword) {
       return errorMessage(res, 401, "Current password is incorrect");
@@ -257,10 +248,8 @@ export const changePasswordController = async (req, res, next) => {
     res.clearCookie("access_token");
 
     return sucessMessage(res, 200, "Password updated successfully", null);
-
   } catch (error) {
     console.error("Password change error:", error);
     next(error);
   }
 };
-

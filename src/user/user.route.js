@@ -14,11 +14,15 @@ import { isAdmin } from "../middleware/role.middleware.js";
 import { authenticationMiddleware } from "../middleware/auth.middleware.js";
 const router = express.Router();
 router.post("/", createUserController);
-router.get("/", authenticationMiddleware, isAdmin,getUserController);// issue 12 add authentication middleware and isAdmin middleware to get all users route
-router.patch("/me/password", authenticationMiddleware, changePasswordController);
+router.get("/", authenticationMiddleware, isAdmin, getUserController); // issue 12 add authentication middleware and isAdmin middleware to get all users route
+router.patch(
+  "/me/password",
+  authenticationMiddleware,
+  changePasswordController
+);
 router.get("/:id", authenticationMiddleware, isAdmin, getUserByIdController);
 
-router.delete("/:id", authenticationMiddleware, isAdmin, deleteUserController);//Issue 13  id ,authentication middleware and isAdmin middleware added to delete user route
+router.delete("/:id", authenticationMiddleware, isAdmin, deleteUserController); //Issue 13  id ,authentication middleware and isAdmin middleware added to delete user route
 router.patch("/:id", authenticationMiddleware, isAdmin, updateUserController);
 router.patch(
   "/:id/role",
@@ -26,6 +30,15 @@ router.patch(
   isAdmin,
   updateUserRoleController
 );
-router.patch("/:id/status", authenticationMiddleware, isAdmin, updateUserstatusController);
-router.patch("/me/password", authenticationMiddleware, changePasswordController);
+router.patch(
+  "/:id/status",
+  authenticationMiddleware,
+  isAdmin,
+  updateUserstatusController
+);
+router.patch(
+  "/me/password",
+  authenticationMiddleware,
+  changePasswordController
+);
 export { router };

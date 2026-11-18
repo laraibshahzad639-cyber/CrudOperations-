@@ -120,12 +120,8 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": [
-                    "taskId"
-                  ],
-                  "targetFields": [
-                    "id"
-                  ]
+                  "localFields": ["taskId"],
+                  "targetFields": ["id"]
                 },
                 "to": {
                   "model": "Task",
@@ -136,12 +132,8 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": [
-                    "userId"
-                  ],
-                  "targetFields": [
-                    "id"
-                  ]
+                  "localFields": ["userId"],
+                  "targetFields": ["id"]
                 },
                 "to": {
                   "model": "User",
@@ -263,12 +255,8 @@
               "comments": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": [
-                    "id"
-                  ],
-                  "targetFields": [
-                    "taskId"
-                  ]
+                  "localFields": ["id"],
+                  "targetFields": ["taskId"]
                 },
                 "to": {
                   "model": "Comment",
@@ -279,12 +267,8 @@
                 "cardinality": "N:1",
                 "nullable": false,
                 "on": {
-                  "localFields": [
-                    "userId"
-                  ],
-                  "targetFields": [
-                    "id"
-                  ]
+                  "localFields": ["userId"],
+                  "targetFields": ["id"]
                 },
                 "to": {
                   "model": "User",
@@ -398,12 +382,8 @@
               "comments": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": [
-                    "id"
-                  ],
-                  "targetFields": [
-                    "userId"
-                  ]
+                  "localFields": ["id"],
+                  "targetFields": ["userId"]
                 },
                 "to": {
                   "model": "Comment",
@@ -413,12 +393,8 @@
               "tasks": {
                 "cardinality": "1:N",
                 "on": {
-                  "localFields": [
-                    "id"
-                  ],
-                  "targetFields": [
-                    "userId"
-                  ]
+                  "localFields": ["id"],
+                  "targetFields": ["userId"]
                 },
                 "to": {
                   "model": "Task",
@@ -510,16 +486,12 @@
                   },
                   "onDelete": "cascade",
                   "source": {
-                    "columns": [
-                      "taskId"
-                    ],
+                    "columns": ["taskId"],
                     "namespaceId": "public",
                     "tableName": "Comment"
                   },
                   "target": {
-                    "columns": [
-                      "id"
-                    ],
+                    "columns": ["id"],
                     "namespaceId": "public",
                     "tableName": "Task"
                   }
@@ -530,16 +502,12 @@
                   },
                   "onDelete": "cascade",
                   "source": {
-                    "columns": [
-                      "userId"
-                    ],
+                    "columns": ["userId"],
                     "namespaceId": "public",
                     "tableName": "Comment"
                   },
                   "target": {
-                    "columns": [
-                      "id"
-                    ],
+                    "columns": ["id"],
                     "namespaceId": "public",
                     "tableName": "User"
                   }
@@ -547,26 +515,20 @@
               ],
               "indexes": [
                 {
-                  "columns": [
-                    "taskId"
-                  ],
+                  "columns": ["taskId"],
                   "name": "Comment_taskId_idx_4965c936",
                   "prefix": "Comment_taskId_idx",
                   "unique": false
                 },
                 {
-                  "columns": [
-                    "userId"
-                  ],
+                  "columns": ["userId"],
                   "name": "Comment_userId_idx_a489d58a",
                   "prefix": "Comment_userId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": [
-                  "id"
-                ]
+                "columns": ["id"]
               },
               "uniques": []
             },
@@ -669,16 +631,12 @@
                     "name": "Task_userId_idx_a489d58a"
                   },
                   "source": {
-                    "columns": [
-                      "userId"
-                    ],
+                    "columns": ["userId"],
                     "namespaceId": "public",
                     "tableName": "Task"
                   },
                   "target": {
-                    "columns": [
-                      "id"
-                    ],
+                    "columns": ["id"],
                     "namespaceId": "public",
                     "tableName": "User"
                   }
@@ -686,27 +644,20 @@
               ],
               "indexes": [
                 {
-                  "columns": [
-                    "userId",
-                    "createdAt"
-                  ],
+                  "columns": ["userId", "createdAt"],
                   "name": "Task_userId_createdAt_idx_f726f04a",
                   "prefix": "Task_userId_createdAt_idx",
                   "unique": false
                 },
                 {
-                  "columns": [
-                    "userId"
-                  ],
+                  "columns": ["userId"],
                   "name": "Task_userId_idx_a489d58a",
                   "prefix": "Task_userId_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": [
-                  "id"
-                ]
+                "columns": ["id"]
               },
               "uniques": []
             },
@@ -781,24 +732,18 @@
               "foreignKeys": [],
               "indexes": [
                 {
-                  "columns": [
-                    "createdAt"
-                  ],
+                  "columns": ["createdAt"],
                   "name": "User_createdAt_idx_9575dbd7",
                   "prefix": "User_createdAt_idx",
                   "unique": false
                 }
               ],
               "primaryKey": {
-                "columns": [
-                  "id"
-                ]
+                "columns": ["id"]
               },
               "uniques": [
                 {
-                  "columns": [
-                    "email"
-                  ]
+                  "columns": ["email"]
                 }
               ]
             }
@@ -806,26 +751,15 @@
           "valueSet": {
             "Priority": {
               "kind": "valueSet",
-              "values": [
-                "HIGH",
-                "LOW",
-                "MEDIUM"
-              ]
+              "values": ["HIGH", "LOW", "MEDIUM"]
             },
             "Role": {
               "kind": "valueSet",
-              "values": [
-                "ADMIN",
-                "USER"
-              ]
+              "values": ["ADMIN", "USER"]
             },
             "Status": {
               "kind": "valueSet",
-              "values": [
-                "TODO",
-                "IN_PROGRESS",
-                "COMPLETED"
-              ]
+              "values": ["TODO", "IN_PROGRESS", "COMPLETED"]
             }
           }
         },

@@ -4,7 +4,6 @@
 // async function main() {
 //   console.log(" Seed started...");
 
-  
 //   const adminEmail = process.env.ADMIN_EMAIL || "admin@example.com";
 //   const rawPassword = process.env.ADMIN_PASSWORD || "admin123";
 
@@ -80,8 +79,6 @@
 //     }
 //   });
 
-
-
 import { db } from "./db.ts";
 import argon2 from "argon2";
 
@@ -90,14 +87,69 @@ const TASK_COUNT = 120;
 const COMMENTS_PER_TASK = 3;
 
 const firstNames = [
-  "Ava", "Noah", "Mila", "Liam", "Sophia", "Ethan", "Isla", "Lucas",
-  "Emma", "Mason", "Olivia", "James", "Amelia", "Benjamin", "Charlotte",
-  "Henry", "Harper", "Leo", "Evelyn", "Daniel", "Scarlett", "Jack", "Chloe",
-  "Mateo", "Layla", "Owen", "Nora", "Gabriel", "Luna", "Wyatt", "Aria",
-  "Julian", "Ella", "Leo", "Hazel", "Isaac", "Maya", "Nathan", "Stella",
-  "Elijah", "Aurora", "Hudson", "Paisley", "Samuel", "Nova", "Adrian", "Ruby",
-  "Thomas", "Ivy", "David", "Leah", "Joseph", "Ariana", "Carter", "Vivian",
-  "John", "Claire", "Luke", "Savannah", "Ryan", "Skyler", "Anthony", "Penelope"
+  "Ava",
+  "Noah",
+  "Mila",
+  "Liam",
+  "Sophia",
+  "Ethan",
+  "Isla",
+  "Lucas",
+  "Emma",
+  "Mason",
+  "Olivia",
+  "James",
+  "Amelia",
+  "Benjamin",
+  "Charlotte",
+  "Henry",
+  "Harper",
+  "Leo",
+  "Evelyn",
+  "Daniel",
+  "Scarlett",
+  "Jack",
+  "Chloe",
+  "Mateo",
+  "Layla",
+  "Owen",
+  "Nora",
+  "Gabriel",
+  "Luna",
+  "Wyatt",
+  "Aria",
+  "Julian",
+  "Ella",
+  "Leo",
+  "Hazel",
+  "Isaac",
+  "Maya",
+  "Nathan",
+  "Stella",
+  "Elijah",
+  "Aurora",
+  "Hudson",
+  "Paisley",
+  "Samuel",
+  "Nova",
+  "Adrian",
+  "Ruby",
+  "Thomas",
+  "Ivy",
+  "David",
+  "Leah",
+  "Joseph",
+  "Ariana",
+  "Carter",
+  "Vivian",
+  "John",
+  "Claire",
+  "Luke",
+  "Savannah",
+  "Ryan",
+  "Skyler",
+  "Anthony",
+  "Penelope",
 ];
 
 const taskTitles = [
@@ -161,7 +213,7 @@ const taskTitles = [
   "Fix cron job timeout",
   "Add backup verification check",
   "Implement data cleanup routine",
-  "Monitor rate-limit usage"
+  "Monitor rate-limit usage",
 ];
 
 const commentBodies = [
@@ -179,7 +231,7 @@ const commentBodies = [
   "This should be verified in staging before shipping to production.",
   "I think the solution is correct, but we need to confirm the edge case.",
   "The task is progressing well; we just need to finalize the QA pass.",
-  "I’ve shared the latest update internally and the team is aligned."
+  "I’ve shared the latest update internally and the team is aligned.",
 ];
 
 function randomFrom(items) {
@@ -246,7 +298,11 @@ async function main() {
   for (let i = 0; i < tasks.length; i++) {
     const task = tasks[i];
 
-    for (let commentIndex = 0; commentIndex < COMMENTS_PER_TASK; commentIndex++) {
+    for (
+      let commentIndex = 0;
+      commentIndex < COMMENTS_PER_TASK;
+      commentIndex++
+    ) {
       const commenter = users[(i + commentIndex + 1) % users.length];
 
       await db.orm.public.Comment.create({

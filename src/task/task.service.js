@@ -2,54 +2,44 @@ import { role } from "@prisma/orm-postgres/contract-builder";
 import { db } from "../prisma/db.ts";
 import { Temporal } from "@js-temporal/polyfill";
 
-
 export const createTask = async (data) => {
   return db.orm.public.Task.create(data);
 };
 
-export const getTaskById = async (id, userId,role) => {
-const filter=role==="ADMIN"?{id}:{id,userId};
+export const getTaskById = async (id, userId, role) => {
+  const filter = role === "ADMIN" ? { id } : { id, userId };
 
-  const task = await db.orm.public.Task.where( filter ).first();
-
+  const task = await db.orm.public.Task.where(filter).first();
 
   return task;
 };
 
 export const deleteTask = async (id, userId, role) => {
-  const filter = role === "ADMIN"
-    ? { id }
-    : { id, userId };
+  const filter = role === "ADMIN" ? { id } : { id, userId };
 
-  const task = await db.orm.public.Task
-    .where(filter)
-    .first();
+  const task = await db.orm.public.Task.where(filter).first();
 
   if (!task) {
     return null;
   }
 
-  await db.orm.public.Task
-    .where(filter)
-    .delete();
+  await db.orm.public.Task.where(filter).delete();
 
   return task;
 };
 
 export const updateTask = async (id, userId, data, role) => {
- 
-const filter=role==="ADMIN"?{id}:{id,userId};
- return  await db.orm.public.Task.where(filter).update(data);
-//   if (role === "ADMIN") {
-//     await db.orm.public.Task.where({ id }).update(data);
-//   } else {
-//     await db.orm.public.Task.where({ id, userId }).update(data);
-//   }
+  const filter = role === "ADMIN" ? { id } : { id, userId };
+  return await db.orm.public.Task.where(filter).update(data);
+  //   if (role === "ADMIN") {
+  //     await db.orm.public.Task.where({ id }).update(data);
+  //   } else {
+  //     await db.orm.public.Task.where({ id, userId }).update(data);
+  //   }
 
-//   return await getTaskById(id, userId);
-// };
-}
-
+  //   return await getTaskById(id, userId);
+  // };
+};
 
 export const getAllTask = async ({
   role,
@@ -59,7 +49,7 @@ export const getAllTask = async ({
   status,
   page1 = 1,
   limit1 = 10,
-  order
+  order,
 }) => {
   const skip = (page1 - 1) * limit1;
 
@@ -100,9 +90,7 @@ export const getAllTask = async ({
     .all();
 };
 
-
 export const checkStatusSummary = async (role, userId) => {
-
   const summary = {
     TODO: 0,
     IN_PROGRESS: 0,
@@ -117,11 +105,9 @@ export const checkStatusSummary = async (role, userId) => {
     tasks = db.orm.public.Task.where({ userId: userId });
   }
 
-  const result = await tasks
-    .groupBy("status")
-    .aggregate((aggregate) => ({
-      count: aggregate.count(),
-    }));
+  const result = await tasks.groupBy("status").aggregate((aggregate) => ({
+    count: aggregate.count(),
+  }));
 
   for (let task of result) {
     if (task.status === "TODO") {
@@ -137,7 +123,6 @@ export const checkStatusSummary = async (role, userId) => {
 };
 
 export const getOverdueTask = async (role, userId) => {
-
   let task = db.orm.public.Task;
 
   if (role !== "ADMIN") {
@@ -151,7 +136,6 @@ export const getOverdueTask = async (role, userId) => {
   const overdueTasks = [];
 
   for (const item of allTasks) {
-
     if (
       item.dueDate &&
       Temporal.Instant.compare(
@@ -176,9 +160,7 @@ export const upcommingTasks = async (userId, role, days = 7) => {
   let tasks;
 
   if (role !== "ADMIN") {
-    tasks = await db.orm.public.Task
-      .where({ userId: userId })
-      .all();
+    tasks = await db.orm.public.Task.where({ userId: userId }).all();
   } else {
     tasks = await db.orm.public.Task.all();
   }
@@ -193,28 +175,24 @@ export const upcommingTasks = async (userId, role, days = 7) => {
     return (
       dueDate >= startDate &&
       dueDate <= endDate &&
-      task.status !== "COMPLETED"&&
-           task.completed !== true
+      task.status !== "COMPLETED" &&
+      task.completed !== true
     );
   });
 
   upcomingTasks.sort((a, b) => {
-    return (
-      new Date(a.dueDate.toString()) -
-      new Date(b.dueDate.toString())
-    );
+    return new Date(a.dueDate.toString()) - new Date(b.dueDate.toString());
   });
 
   return upcomingTasks;
 };
 // export const extendDueDate=async(id,userId,role,days)=>{
-  
+
 //   let task;
 //   if(role!=="ADMIN"){
 //     task=await db.orm.public.Task.where({userId:userId,id}).all();
 //   }
- 
-  
+
 //   if(task.status==="COMPLETED"||task.completed===true){
 //     return errorMessage(res,400,"Cannot extend due date for completed task");
 
@@ -230,20 +208,13 @@ export const upcommingTasks = async (userId, role, days = 7) => {
 
 // }
 
-
-
 export const extendDueDate = async (id, userId, role, days) => {
-
   let task;
 
   if (role !== "ADMIN") {
-    task = await db.orm.public.Task
-      .where({ userId: userId, id })
-      .first();
+    task = await db.orm.public.Task.where({ userId: userId, id }).first();
   } else {
-    task = await db.orm.public.Task
-      .where({ id })
-      .first();
+    task = await db.orm.public.Task.where({ id }).first();
   }
 
   if (!task) {
@@ -266,7 +237,6 @@ export const extendDueDate = async (id, userId, role, days) => {
 
   const oldDueDate = Temporal.Instant.from(task.dueDate.toString());
 
- 
   let baseDate = oldDueDate;
 
   if (Temporal.Instant.compare(oldDueDate, currentDate) < 0) {
@@ -274,13 +244,12 @@ export const extendDueDate = async (id, userId, role, days) => {
   }
 
   const updateDate = baseDate.add({
-    hours: Number(days) * 24
+    hours: Number(days) * 24,
   });
 
-
-  const updatedTask = await db.orm.public.Task
-    .where({ id })
-    .update({ dueDate: updateDate });
+  const updatedTask = await db.orm.public.Task.where({ id }).update({
+    dueDate: updateDate,
+  });
 
   return updatedTask;
 };

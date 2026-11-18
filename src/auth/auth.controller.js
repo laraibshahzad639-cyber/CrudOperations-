@@ -1,4 +1,3 @@
-
 import { db } from "../prisma/db.ts";
 import jwt from "jsonwebtoken";
 import argon2 from "argon2";

@@ -3,10 +3,7 @@ import { sucessMessage } from "../utils/sucessMesage.js";
 import { errorMessage } from "../utils/errorMesage.js";
 import { db } from "../prisma/db.ts";
 
-
 import { getUserById } from "../user/user.service.js";
-
-
 
 export const createTaskController = async (req, res, next) => {
   try {
@@ -16,27 +13,27 @@ export const createTaskController = async (req, res, next) => {
       completed,
       priority = "MEDIUM",
       status = "TODO",
-      dueDate
+      dueDate,
     } = req.body;
 
-  
     if (!title || typeof title !== "string" || title.trim().length === 0) {
       return errorMessage(res, 400, "Title is required");
     }
 
-  
-    if (description !== undefined && description !== null && typeof description !== "string") {
+    if (
+      description !== undefined &&
+      description !== null &&
+      typeof description !== "string"
+    ) {
       return errorMessage(res, 400, "Description must be a string or null");
     }
 
-  
     const validPriorities = ["LOW", "MEDIUM", "HIGH"];
 
     if (!validPriorities.includes(priority)) {
       return errorMessage(res, 400, "Invalid priority");
     }
 
- 
     const validStatus = ["TODO", "IN_PROGRESS", "COMPLETED"];
 
     if (!validStatus.includes(status)) {
@@ -47,11 +44,14 @@ export const createTaskController = async (req, res, next) => {
       return errorMessage(res, 400, "Completed must be a boolean");
     }
 
-
     const taskCompleted = status === "COMPLETED";
 
     if (completed !== undefined && completed !== taskCompleted) {
-      return errorMessage(res, 400, "Status and completed values cannot conflict");
+      return errorMessage(
+        res,
+        400,
+        "Status and completed values cannot conflict"
+      );
     }
 
     const data = {
@@ -73,11 +73,9 @@ export const createTaskController = async (req, res, next) => {
   }
 };
 
-
-
 export const deleteTaskController = async (req, res, next) => {
   try {
-    const { id } = req.params;// add role parameters to deletefuction and also add authentication middleware to delete route in task.route.js 
+    const { id } = req.params; // add role parameters to deletefuction and also add authentication middleware to delete route in task.route.js
 
     const { userId, role } = req.user;
 
@@ -97,11 +95,13 @@ export const getTaskByIdController = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-
-    const task = await TaskService.getTaskById(id, req.user.userId, req.user.role);//add role parameter to getTaskById function
+    const task = await TaskService.getTaskById(
+      id,
+      req.user.userId,
+      req.user.role
+    ); //add role parameter to getTaskById function
 
     if (!task) {
-    
       return errorMessage(res, 404, "Task Not Found ");
     }
 
@@ -112,13 +112,17 @@ export const getTaskByIdController = async (req, res, next) => {
   }
 };
 
-
 export const updateTaskController = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { title, description, completed, priority, status, dueDate } = req.body || {};
+    const { title, description, completed, priority, status, dueDate } =
+      req.body || {};
 
-    const task = await TaskService.getTaskById(id, req.user.userId, req.user.role); //add role parameter to getTaskById function
+    const task = await TaskService.getTaskById(
+      id,
+      req.user.userId,
+      req.user.role
+    ); //add role parameter to getTaskById function
 
     if (!task) {
       return errorMessage(res, 404, "Task Not Found");
@@ -126,49 +130,48 @@ export const updateTaskController = async (req, res, next) => {
 
     const updateData = {};
 
-if (title !== undefined) {
-  if (typeof title !== "string" || title.trim().length === 0) {
-    return errorMessage(res, 400, "Title must be a non-empty string");
-  }
-  updateData.title = title.trim();
-}
-
-if (description !== undefined) {
-  if (description === null) {
-    updateData.description = null;
-  } else if (typeof description !== "string") {
-    return errorMessage(res, 400, "Description must be a string or null");
-  } else {
-    updateData.description = description.trim();
-  }
-}
-
-if (priority !== undefined) {
-  if (typeof priority !== "string") {
-    return errorMessage(res, 400, "Priority must be a string");
-  }
-  const cleanPriority = priority.trim().toUpperCase();
-  if (!["LOW", "MEDIUM", "HIGH"].includes(cleanPriority)) {
-    return errorMessage(res, 400, "Invalid priority");
-  }
-  updateData.priority = cleanPriority;
-}
-
-if (dueDate !== undefined) {
-  if (dueDate === null) {
-    updateData.dueDate = null;
-  } else if (typeof dueDate !== "string") {
-    return errorMessage(res, 400, "Invalid dueDate");
-  } else {
-    try {
-      const validDate = Temporal.Instant.from(dueDate);
-      updateData.dueDate = validDate;
-    } catch {
-      return errorMessage(res, 400, "Invalid dueDate");
+    if (title !== undefined) {
+      if (typeof title !== "string" || title.trim().length === 0) {
+        return errorMessage(res, 400, "Title must be a non-empty string");
+      }
+      updateData.title = title.trim();
     }
-  }
-}
 
+    if (description !== undefined) {
+      if (description === null) {
+        updateData.description = null;
+      } else if (typeof description !== "string") {
+        return errorMessage(res, 400, "Description must be a string or null");
+      } else {
+        updateData.description = description.trim();
+      }
+    }
+
+    if (priority !== undefined) {
+      if (typeof priority !== "string") {
+        return errorMessage(res, 400, "Priority must be a string");
+      }
+      const cleanPriority = priority.trim().toUpperCase();
+      if (!["LOW", "MEDIUM", "HIGH"].includes(cleanPriority)) {
+        return errorMessage(res, 400, "Invalid priority");
+      }
+      updateData.priority = cleanPriority;
+    }
+
+    if (dueDate !== undefined) {
+      if (dueDate === null) {
+        updateData.dueDate = null;
+      } else if (typeof dueDate !== "string") {
+        return errorMessage(res, 400, "Invalid dueDate");
+      } else {
+        try {
+          const validDate = Temporal.Instant.from(dueDate);
+          updateData.dueDate = validDate;
+        } catch {
+          return errorMessage(res, 400, "Invalid dueDate");
+        }
+      }
+    }
 
     if (completed !== undefined) {
       const isCompleted = completed === true || completed === "true";
@@ -188,23 +191,23 @@ if (dueDate !== undefined) {
         updateData.status = isCompleted ? "COMPLETED" : "IN_PROGRESS";
       }
     }
-if (status !== undefined) {
-  if (typeof status !== "string") {
-    return errorMessage(res, 400, "Status must be a string");
-  }
-  const cleanStatus = status.trim().toUpperCase();
+    if (status !== undefined) {
+      if (typeof status !== "string") {
+        return errorMessage(res, 400, "Status must be a string");
+      }
+      const cleanStatus = status.trim().toUpperCase();
 
       if (!["TODO", "IN_PROGRESS", "COMPLETED"].includes(cleanStatus)) {
         return errorMessage(res, 400, "Invalid status");
       }
       const ALLOWED_TRANSITIONS = {
-        TODO: ["IN_PROGRESS", "COMPLETED"],//add allowed transitions for status update to prevent invalid transitions and only change if condition
+        TODO: ["IN_PROGRESS", "COMPLETED"], //add allowed transitions for status update to prevent invalid transitions and only change if condition
         IN_PROGRESS: ["TODO", "COMPLETED"],
         COMPLETED: ["IN_PROGRESS"],
       };
 
-     const allowedStatuses = ALLOWED_TRANSITIONS[task.status] 
-     if (!allowedStatuses.includes(cleanStatus)) {
+      const allowedStatuses = ALLOWED_TRANSITIONS[task.status];
+      if (!allowedStatuses.includes(cleanStatus)) {
         return errorMessage(
           res,
           409,
@@ -227,44 +230,55 @@ if (status !== undefined) {
     }
 
     return sucessMessage(res, 200, "Task updated successfully", updatedTask);
-
   } catch (error) {
     console.error("Update Task Error:", error);
     next(error);
   }
 };
 
-
-
-
 export const getAllTaskController = async (req, res, next) => {
   try {
     const { completed, page, limit, order, priority, status } = req.query;
-    const cleanPriority=priority?.trim().toUpperCase()
-    const cleanStatus=status?.trim().toUpperCase()
-    const cleanOrder=order?.trim().toUpperCase()
-    if(completed!==undefined && completed !== "true" && completed !== "false"){
-      return errorMessage(res,400,"Invalid completed value")
+    const cleanPriority = priority?.trim().toUpperCase();
+    const cleanStatus = status?.trim().toUpperCase();
+    const cleanOrder = order?.trim().toUpperCase();
+    if (
+      completed !== undefined &&
+      completed !== "true" &&
+      completed !== "false"
+    ) {
+      return errorMessage(res, 400, "Invalid completed value");
     }
-    if(cleanStatus!==undefined&&cleanStatus!=="TODO"&&cleanStatus!=="IN_PROGRESS"&&cleanStatus!=="COMPLETED"){
-      return errorMessage(res,400,"Invalid status values")
+    if (
+      cleanStatus !== undefined &&
+      cleanStatus !== "TODO" &&
+      cleanStatus !== "IN_PROGRESS" &&
+      cleanStatus !== "COMPLETED"
+    ) {
+      return errorMessage(res, 400, "Invalid status values");
     }
-    if(cleanOrder!==undefined&&cleanOrder!=="ASC"&&cleanOrder!=="DESC"){
-      return errorMessage(res,400,"Invalid order values")
+    if (
+      cleanOrder !== undefined &&
+      cleanOrder !== "ASC" &&
+      cleanOrder !== "DESC"
+    ) {
+      return errorMessage(res, 400, "Invalid order values");
     }
-  if(cleanPriority!==undefined&&cleanPriority!=="LOW"&&cleanPriority!=="MEDIUM"&&cleanPriority!=="HIGH"){
-    return errorMessage(res,400,"Invalid priority values")
-  }
- 
+    if (
+      cleanPriority !== undefined &&
+      cleanPriority !== "LOW" &&
+      cleanPriority !== "MEDIUM" &&
+      cleanPriority !== "HIGH"
+    ) {
+      return errorMessage(res, 400, "Invalid priority values");
+    }
 
     const page1 = Number(page) || 1;
     const limit1 = Number(limit) || 10;
 
-    
-
     const task = await TaskService.getAllTask({
       role: req.user.role,
-      userId: req.user.userId,//ignore ivalid filter
+      userId: req.user.userId, //ignore ivalid filter
       completed: completed === undefined ? undefined : completed === "true",
       priority: cleanPriority,
       status: cleanStatus,
@@ -274,7 +288,6 @@ export const getAllTaskController = async (req, res, next) => {
     });
 
     return sucessMessage(res, 200, "Tasks fetched successfully", task);
-
   } catch (error) {
     console.error("Get all tasks error:", error);
     return next(error);
@@ -299,22 +312,25 @@ export const checkStatusController = async (req, res, next) => {
     next(error);
   }
 };
-export const getOverDueTasksController=async(req ,res,next)=>{
-  try{
-    const role=req.user.role;
-    const userId=req.user.userId
-    const overDueTask=await TaskService.getOverdueTask(role,userId)
-   if (overDueTask.length === 0) {
-      return errorMessage(res,404,"OverDue tasks not found")
+export const getOverDueTasksController = async (req, res, next) => {
+  try {
+    const role = req.user.role;
+    const userId = req.user.userId;
+    const overDueTask = await TaskService.getOverdueTask(role, userId);
+    if (overDueTask.length === 0) {
+      return errorMessage(res, 404, "OverDue tasks not found");
     }
-    return sucessMessage(res,200,"OverDue tasks fetched sucessfully ",overDueTask)
-    
+    return sucessMessage(
+      res,
+      200,
+      "OverDue tasks fetched sucessfully ",
+      overDueTask
+    );
+  } catch (error) {
+    console.log("check error", error);
+    next(error);
   }
-  catch(error){
-    console.log("check error",error)
-    next(error)
-  }
-}
+};
 export const upcommingTasksController = async (req, res, next) => {
   try {
     const { days } = req.query;
@@ -343,25 +359,34 @@ export const upcommingTasksController = async (req, res, next) => {
     next(error);
   }
 };
-export const extendDueDateController=async(req,res,next)=>{
-  try{
-    const {id}=req.params;
-    const {days}=req.body;
-    if(!days){
-     return errorMessage(res,400,"Days is required")
+export const extendDueDateController = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { days } = req.body;
+    if (!days) {
+      return errorMessage(res, 400, "Days is required");
     }
 
     if (!Number.isInteger(days1) || days1 < 1) {
       return errorMessage(res, 400, "Days must be a positive integer");
     }
-    const updateDueDate= await  TaskService.extendDueDate(id,req.user.userId,days1,req.user.role)
-    if(!updateDueDate){
-      return errorMessage(res,404,"Task Not Found")
+    const updateDueDate = await TaskService.extendDueDate(
+      id,
+      req.user.userId,
+      days1,
+      req.user.role
+    );
+    if (!updateDueDate) {
+      return errorMessage(res, 404, "Task Not Found");
     }
-    return sucessMessage(res,200,"Due Date extended successfully",updateDueDate)
+    return sucessMessage(
+      res,
+      200,
+      "Due Date extended successfully",
+      updateDueDate
+    );
+  } catch (error) {
+    console.log("check error", error);
+    next(error);
   }
-  catch(error){
-    console.log("check error",error)
-    next(error)
-  }
-}
+};

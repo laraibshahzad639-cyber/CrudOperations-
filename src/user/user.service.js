@@ -1,30 +1,30 @@
 import { db } from "../prisma/db.ts";
 import argon2 from "argon2";
 
-export const getUsers = async (limitNumber, pageNumber) => {//Issue 12 remove comments and tasks fromm service add pagination (solution remove sensitive data like comments and tasks from service layer and add pagination to get all users service)
+export const getUsers = async (limitNumber, pageNumber) => {
+  //Issue 12 remove comments and tasks fromm service add pagination (solution remove sensitive data like comments and tasks from service layer and add pagination to get all users service)
   const offset = (pageNumber - 1) * limitNumber;
 
-  return await db.orm.public.User
-    .select(
-      "id",
-      "name",
-      "email",
-      "role",
-      "isActive",
-      "createdAt"
-    )
+  return await db.orm.public.User.select(
+    "id",
+    "name",
+    "email",
+    "role",
+    "isActive",
+    "createdAt"
+  )
     .limit(limitNumber)
     .offset(offset)
     .all();
 };
 
-
 export const getUserById = async (id) => {
-
   return await db.orm.public.User.where({ id }).first();
 };
 export const updateUsers = async (id, data) => {
-  return await db.orm.public.User.where({ id }).select("id","email","name","role","createdAt","updatedAt").update(data)
+  return await db.orm.public.User.where({ id })
+    .select("id", "email", "name", "role", "createdAt", "updatedAt")
+    .update(data);
 };
 export const deleteUsers = async (id) => {
   return await db.orm.public.User.where({ id }).delete();
@@ -52,7 +52,8 @@ export const getUserCredentialsById = async (id) => {
   return db.orm.public.User.where({ id }).first();
 };
 export const countActiveAdmins = async () => {
-  return await db.orm.public.User
-    .where({ role: "ADMIN", isActive: true })
-    .count();
+  return await db.orm.public.User.where({
+    role: "ADMIN",
+    isActive: true,
+  }).count();
 };
